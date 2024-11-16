@@ -6,11 +6,11 @@ execute:
   echo: true
 
 book:
-  title: "YOUR PROJECT TITLE"
+  title: "Affordable Housing Production by Building"
   author:
-    - AUTHOR1 (UNI1)
-    - AUTHOR2 (UNI2)
-  repo-url: https://github.com/YOUR_GITHUB_ACCOUNT/REPO_NAME
+    - Ashley Noh (cn2671)
+    - Jeong Yong Yang (jy3464)
+  repo-url: https://github.com/chrisyang922/HousingProduction
   date: today
   page-footer:
     right: |
