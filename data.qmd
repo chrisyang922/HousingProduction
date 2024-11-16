@@ -2,4 +2,154 @@
 
 ## Description
 
+The project aims to analyze affordable house units in NYC. The dataset originates from The Department of Housing Preservation and Development (HPD), a department of the government of NYC dedicated to ensuring quality and affordable housing while sustaining neighborhood strength and diversity.
+
+The dataset can be easily accessed through downloading the CSV file from https://data.cityofnewyork.us/Housing-Development/Affordable-Housing-Production-by-Building/hg8x-zxpr/about_data, which can be directed via the NYC Housing Preservation & Development government website (https://www.nyc.gov/site/hpd/about/open-data.page). 
+
+The dataset was compiled by HPD using various methods, including wage information for housing development projects as mandated by Local Law 44, registration details from owners of residential rental properties, and survey data from housing units across the city. It consists of 41 columns and 7,637 rows, with each row representing details of a housing development or preservation project. According to the HPD, the dataset was first made publicly available on December 20, 2016, and undergoes updates quarterly. The most recent update occurred on September 23, 2024. 
+
+A notable issue with the dataset is the potential redundancy of buildings, as a single building may appear more than once if it was involved in more than one project. This implies the need for data transformation during the cleaning process to address these duplicates.
+
 ## Missing value analysis
+
+```{r}
+library(readr)
+data <- read.csv("/Users/chrisyang/Downloads/Housing.csv")
+head(data)
+```
+
+```{r}
+colnames(data)
+```
+
+We do not require every column of the dataset since our interest lies in analyzing affordable house units in NYC.
+
+Below are the columns selected within the dataset to satisfy the goal of the project.
+
+Data Explanation 
+
+1. Building ID: unique numeric identifier assigned to each building by HPD.
+
+2. Borough: borough where the building is located.
+
+3. Community Board: the New York City Community District where the building is located.
+
+4. Council District: the New York City Council District where the building is located.
+
+5. Census Tract: the 2010 U.S. Census Tract where the building is located.
+
+6. Latitude: location of the property on the earth’s surface. 
+
+7. Longitude: location of the property on the earth’s surface. 
+
+8. Extremely Low Income Units: units with rents that are affordable to households earning 0 to 30% of the area median income 
+
+9. Very Low Income Units: units with rents that are affordable to households earning 31 to 50% of the area median income
+
+10. Low Income Units: units with rents that are affordable to households earning 51 to 80% of the area median income
+
+11. Moderate Income Units: units with rents that are affordable to households earning 81 to 120% of the area median income
+
+12. Middle Income Units: units with rents that are affordable to households earning 121 to 165% of the area median income
+
+13. Other Income Units: units reserved for building superintendents
+
+14. Studio Units: units with 0-bedrooms.
+
+15. 1-BR Units: units with 1-bedroom.
+
+16. 2-BR Units: units with 2-bedrooms.
+
+17. 3-BR Units: units with 3-bedrooms.
+
+18. 4-BR Units: units with 4-bedrooms.
+
+19. 5-BR Units: units with 5-bedrooms.
+
+20. 6-BR+ Units: units with 6-bedrooms or more.
+
+21. Counted Rental Units: units in the building, counted toward the Housing New York plan, where assistance has been provided to landlords in exchange for a requirement for affordable units.
+
+21. Counted Homeownership Units: units in the building, counted toward the Housing New York Plan, where assistance has been provided directly to homeowners.
+
+22. All Counted Units: total number of affordable units, counted towards the Housing New York plan, that are in the building.
+
+23. Total Units: total number of units, affordable and market rate, in each building.
+
+```{r}
+library(dplyr)
+data <- data |> 
+  select("Building.ID", "Borough", "Community.Board", "Council.District", "Census.Tract", "Latitude", "Longitude", "Extremely.Low.Income.Units",
+         "Very.Low.Income.Units", "Low.Income.Units", "Moderate.Income.Units", "Middle.Income.Units", "Other.Income.Units", "Studio.Units",
+         "X1.BR.Units", "X2.BR.Units", "X3.BR.Units", "X4.BR.Units", "X5.BR.Units", "X6.BR..Units", "Counted.Rental.Units",
+         "Counted.Homeownership.Units", "All.Counted.Units","Total.Units")
+head(data)
+```
+
+To analyze patterns in missing values, we first identify the number of NAs for each column.
+
+```{r}
+NA_per_column <- colSums(is.na(data)) |> sort(decreasing = TRUE)
+NA_per_column
+```
+(Comment)
+
+```{r}
+library(tidyverse)
+library(mi)
+x <- missing_data.frame(data)
+class(x)
+```
+
+
+```{r}
+# x@patterns
+```
+
+
+```{r}
+levels(x@patterns)
+```
+
+```{r}
+summary(x@patterns)
+```
+
+```{r}
+image(x)
+```
+
+
+(Comment) -- large number of rows (cannot use heatmap that utilizes ggplot2 and geom_tile), use mi package to do so
+Pattern -- the same row that has missing values of Building ID, Latitude, Longtitude, and Census.Tract
+
+
+```{r}
+library(redav)
+plot_missing(data, percent = FALSE)
+```
+(Comment)
+
+
+```{r}
+library(ggplot2)
+unique_boroughs <- unique(data$Borough)
+
+graph_by_NA <- data |>
+  group_by(Borough) |>
+  summarize(
+    total_rows = n(),
+    na_count = sum(is.na(Latitude)),
+    na_percentage = (na_count / total_rows) * 100
+  )
+
+ggplot(graph_by_NA, aes(x = Borough, y = na_percentage, fill = Borough)) +
+  geom_bar(stat = "identity") +
+  labs(
+    title = "Percentage of NA Values in Latitude Column by Borough",
+    x = "Borough",
+    y = "Percentage of NA Values"
+  )
+```
+(Comment) -- Missing values are not specifically correlated with another variable in the dataset (example shown above is for Borough)
+No certain value ranges more likely to be missing
