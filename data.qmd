@@ -15,7 +15,6 @@ A notable issue with the dataset is the potential redundancy of buildings, as a 
 ```{r}
 library(readr)
 data <- read.csv("/Users/chrisyang/Downloads/Housing.csv")
-head(data)
 ```
 
 ```{r}
@@ -83,7 +82,6 @@ data <- data |>
          "Very.Low.Income.Units", "Low.Income.Units", "Moderate.Income.Units", "Middle.Income.Units", "Other.Income.Units", "Studio.Units",
          "X1.BR.Units", "X2.BR.Units", "X3.BR.Units", "X4.BR.Units", "X5.BR.Units", "X6.BR..Units", "Counted.Rental.Units",
          "Counted.Homeownership.Units", "All.Counted.Units","Total.Units")
-head(data)
 ```
 
 To analyze patterns in missing values, we first identify the number of NAs for each column.
