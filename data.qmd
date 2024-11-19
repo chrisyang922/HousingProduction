@@ -21,7 +21,7 @@ colnames(data)
 ```
 
 
-## Data Explanation 
+Data Explanation 
 
 This project does not require every column from the dataset, as its focus is on analyzing affordable housing units in NYC. Outlined below are the selected columns from the dataset that may be utilized for the project.
 
