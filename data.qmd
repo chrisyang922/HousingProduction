@@ -12,6 +12,7 @@ One notable issue with the dataset is the possible redundancy of buildings, as a
 
 ```{r}
 library(readr)
+library(dplyr)
 data <- read.csv("/Users/chrisyang/Downloads/Housing.csv")
 ```
 
@@ -19,9 +20,10 @@ data <- read.csv("/Users/chrisyang/Downloads/Housing.csv")
 colnames(data)
 ```
 
-This project does not require every column from the dataset, as its focus is on analyzing affordable housing units in NYC. Outlined below are the selected columns from the dataset that may be utilized for the project.
 
-Data Explanation 
+## Data Explanation 
+
+This project does not require every column from the dataset, as its focus is on analyzing affordable housing units in NYC. Outlined below are the selected columns from the dataset that may be utilized for the project.
 
 1. Borough: borough where the building is located.
 
@@ -70,7 +72,6 @@ Data Explanation
 23. Total Units: total number of units, affordable and market rate, in each building.
 
 ```{r}
-library(dplyr)
 data <- data |> 
   select("Borough", "Community.Board", "Latitude", "Longitude", "Extremely.Low.Income.Units", "Reporting.Construction.Type",
          "Prevailing.Wage.Status", "Very.Low.Income.Units", "Low.Income.Units", "Moderate.Income.Units", "Middle.Income.Units",
@@ -81,6 +82,14 @@ data <- data |>
 
 
 ## Missing value analysis
+```{r}
+library(tidyverse)
+library(mi)
+library(Matrix)
+library(redav)
+library(ggplot2)
+```
+
 
 To examine patterns in missing values, we begin by determining the count of NAs in each column.
 
@@ -91,9 +100,6 @@ NA_per_column
 The Latitude and Longitude columns each have 1,531 missing values.
 
 ```{r}
-library(tidyverse)
-library(mi)
-library(Matrix)
 x <- missing_data.frame(data)
 class(x)
 ```
@@ -120,14 +126,12 @@ To uncover potential patterns among these NAs, we analyzed the data and plotted 
 The dark areas of the figure represent missing values. Our analysis revealed that these NA values originated from the same rows. Specifically, all 1,531 missing values in the Latitude column also corresponded to missing values in the Longitude columns. The cluster within specific observations suggests a possible pattern related to data collection issues or specific subsets in the dataset.
 
 ```{r}
-library(redav)
 plot_missing(data, max_cols = 5, percent = FALSE) 
 ```
 
 Another visualization reveals the same pattern of the NA values. Approximately 6,000 rows have complete data across the columns, while around 1,500 rows have missing values in the Longitude and Latitude columns. The visualization highlights that the NA values in these two columns consistently originate from the same rows.
 
 ```{r}
-library(ggplot2)
 all_boroughs <- unique(data$Borough)
 
 NA_grouping <- data |>
