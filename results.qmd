@@ -10,7 +10,9 @@ library(dplyr)
 library(tidyr)
 library(ggplot2)
 library(sf)
+library(GGally)
 ```
+
 
 ```{r}
 data <- read.csv("/Users/chaerinnoh/Desktop/Housing.csv")
@@ -31,8 +33,8 @@ data <- data |>
   mutate(ProjectDuration = as.numeric(Project.Completion.Date - Project.Start.Date))
 ```
 
-```{r}
 
+```{r}
 income_proportions <- data |>
   select(Borough, Extremely.Low.Income.Units, 
          Very.Low.Income.Units, Low.Income.Units, Moderate.Income.Units,
@@ -87,6 +89,13 @@ ggplot(income_proportions, aes(x = IncomeType, y = Proportion, fill = IncomeType
 ```
 
 Here we look at the income proportions for each borough. Given that the dataset came from an affordable housing project, we can see that the proportions are high for very low income units and low income units for all boroughs. Bronx and Brooklyn show similar patterns, with a gradual increase of proportion from extremely low to low income types and a significant drop on moderate and the low proportion persists to the middle income units. Queens is also similar with the difference being that there are more propotions of moderate and middle income units. One standout observation is the overwhelming proportion of low income units in Staten Island, making up about 52%, with significantly smaller proportions in other income categories. In contrast, Manhattan has a more balanced distribution of income types, showing greater variability. This suggests that its housing developments aim to cater to a broader range of economic groups.
+
+```{r}
+ggparcoord(data, columns=13:19, groupColumn="Borough", alpha=0.3, scale='uniminmax',splineFactor=10, 
+           title = "Modified parallel coordinate plot for Housing Data")
+```
+
+While most of the lines are concentrated around lower values on the y-axis (near 0) we can see that 1BR and 2BR units are the most common housing types for all boroughs. This reflects their suitability for single-person households or small families, which make up a large proportion of NYC's population. Across all boroughs, larger units are relatively rare, highlighting a gap in housing availability for larger families. Bronx, Brooklyn, and Staten Island show more variation and higher spikes in 3BR and larger units. Manhattan has a lot of outliers in where there are a small number of bedroom units.
 
 ```{r}
 manhattan_totals <- data |>
