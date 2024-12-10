@@ -2,7 +2,7 @@
 
 ## Description
 
-The project aims to analyze affordable housing units in NYC. The datasets originate from The Department of Housing Preservation and Development (HPD), a department of the government of NYC dedicated to ensuring quality and affordable housing while sustaining neighborhood strength and diversity. 
+The project aims to analyze affordable housing units in NYC. The dataset originates from The Department of Housing Preservation and Development (HPD), a department of the government of NYC dedicated to ensuring quality and affordable housing while sustaining neighborhood strength and diversity.  
 
 The dataset can be easily accessed by downloading the CSV file from https://data.cityofnewyork.us/Housing-Development/Affordable-Housing-Production-by-Building/hg8x-zxpr/about_data, which can be directed via the NYC Housing Preservation & Development government website (https://www.nyc.gov/site/hpd/about/open-data.page). 
 
