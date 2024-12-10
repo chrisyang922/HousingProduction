@@ -2,7 +2,7 @@
 
 ## Description
 
-The project aims to analyze affordable housing units in NYC. The datasets originate from The Department of Housing Preservation and Development (HPD), a department of the government of NYC dedicated to ensuring quality and affordable housing while sustaining neighborhood strength and diversity. 
+The project aims to analyze affordable housing units in NYC. The dataset originates from The Department of Housing Preservation and Development (HPD), a department of the government of NYC dedicated to ensuring quality and affordable housing while sustaining neighborhood strength and diversity.  
 
 The dataset can be easily accessed by downloading the CSV file from https://data.cityofnewyork.us/Housing-Development/Affordable-Housing-Production-by-Building/hg8x-zxpr/about_data, which can be directed via the NYC Housing Preservation & Development government website (https://www.nyc.gov/site/hpd/about/open-data.page). 
 
@@ -84,8 +84,6 @@ data$Project.Completion.Date[data$Project.Completion.Date == ""] <- NA
 
 ## Missing value analysis
 
-Data 1: Affordable Housing Production by Building
-
 ```{r, include = FALSE, message = FALSE, warning = FALSE}
 library(tidyverse)
 library(mi)
@@ -128,7 +126,7 @@ The dark areas of the figure represent missing values. The figure does not sugge
 plot_missing(data, max_cols = 3, percent = FALSE) 
 ```
 
-Another visualization reveals the same pattern of the NA values. Approximately 6,000 rows have complete data across the columns, while around 1,500 rows have missing values in the Project Completion Date column.
+Another visualization reveals the same pattern of the NA values. Approximately 6,000 rows have complete data across the columns, while around 1,600 rows have missing values in the Project Completion Date column.
 
 
 ```{r}
@@ -151,4 +149,4 @@ ggplot(NA_grouping, aes(x = Borough, y = NA_percent, fill = Borough)) +
   )
 ```
 
-To determine whether missing values in the Project.Completion.Date column are correlated with values of another variable, we analyzed the percentage of NA values by borough (Bronx, Brooklyn, Manhattan, Queens, and Staten Island). The results reveal that Queens marked the highest rate of NA values for both columns (approximately 32%) while Staten Island had the lowest proportion (approximately 2-3%). The rest of the boroughs marked approximately equal rate of NA values at around 20%. This analysis may highlight a clear geographic trend in the missing data, with Queens emerging as the most problematic borough with ongoing projects and Staten Island being the least affected with most of projects completed. It might also suggest that the number of projects varies significantly between boroughs. 
+To determine whether missing values in the Project.Completion.Date column are correlated with values of another variable, we analyzed the percentage of NA values by borough (Bronx, Brooklyn, Manhattan, Queens, and Staten Island). The results reveal that Queens marked the highest rate of NA values (approximately 32%) while Staten Island had the lowest proportion (approximately 2-3%). The rest of the boroughs marked approximately equal rate of NA values at around 20%. This analysis may highlight a clear geographic trend in the missing data, with Queens emerging as the most problematic borough with ongoing projects and Staten Island being the least affected with most of projects completed. It might also suggest that the number of projects varies significantly between boroughs. 
