@@ -11,9 +11,11 @@
 - Homeownership and rental units follow a similar pattern of rise and decline despite differences in their relative percentages, suggesting a strong positive correlation among the two types of housing units.
 
 
+
 ## Limiatations
 The data focuses on housing tied to an affordable housing project, which may not represent the whole NYC's housing market or include privately developed or market-rate housings.
 In addition, the graphs do not account for variations in household size, income level, or demographics, which are factors that can influence housing demand for specific unit types. Borough comparisons may oversimplify the unique socioeconomic and geographic factors influencing housing distributions within each borough.
+
 
 
 ## Future Directions

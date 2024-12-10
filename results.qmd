@@ -35,6 +35,7 @@ data <- data |>
 
 ## Housing Unit Type
 
+
 ```{r, warning = FALSE}
 ProportionData <- data |>
   group_by(Start.Year) |>
@@ -179,7 +180,6 @@ constructionGraphData <- constructionData |>
   ungroup()
 ```
 
-
 ```{r, warning = FALSE}
 constructionData <- constructionData |>
   filter(ProjectDuration != 0)
@@ -195,7 +195,6 @@ ggplot(constructionData, aes(x = ProjectDuration, y = Total.Units)) +
   theme_minimal()
 ```
 This scatterplot examines the relationship between project duration (in days) and the total number of housing units for each construction project across the five boroughs. By visualizing these patterns, we aim to compare housing construction patterns and identify borough specific trends. As concluded from the previous figure, Staten Island recorded the fewest number of newly constructed units, preventing us from drawing meaningful conclusions for that borough. Across all boroughs, most construction projects ended within 1,000 days while a few extending between 1,000 days to 2,000 days.
-
 
 ## Housing Unit Structure Type
 
@@ -311,14 +310,6 @@ Focusing on the number of newly constructed units per unit type (studio, one bed
 
 
 ## Income Type
-
-
-
-
-
-
-
-
 
 ```{r}
 income_proportions <- data |>
@@ -491,6 +482,11 @@ ggplot(merged_data) +
 
 ```
 Each district is colored based on its dominant income unit category, showing housing trends across NYC. Many districts are dominated by "Extremely.Low.Income.Units" and "Very.Low.Income.Units". The clear differences between neighborhoods reveal housing inequalities, with lower-income units concentrated in certain areas. These difference points to broader economic disparities that affect access to housing for different income groups.
+
+
+
+
+
 
 
 
