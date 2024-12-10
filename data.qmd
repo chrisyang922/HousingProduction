@@ -13,7 +13,7 @@ One notable issue with the dataset is the possible redundancy of buildings, as a
 ```{r}
 library(readr)
 library(dplyr)
-data <- read.csv("/Users/chrisyang/Downloads/Housing.csv")
+data <- read.csv("/Users/chaerinnoh/Desktop/Housing.csv")
 ```
 
 ```{r}
@@ -73,9 +73,13 @@ This project does not require every column from the dataset, as its focus is on 
 
 ```{r}
 data <- data |> 
-  select("Borough", "Community.Board", "Latitude", "Longitude", "Extremely.Low.Income.Units", "Reporting.Construction.Type",
-         "Prevailing.Wage.Status", "Very.Low.Income.Units", "Low.Income.Units", "Moderate.Income.Units", "Middle.Income.Units",
-         "Other.Income.Units", "Studio.Units","X1.BR.Units", "X2.BR.Units", "X3.BR.Units", "X4.BR.Units", "X5.BR.Units", 
+  select("Project.Start.Date", "Project.Completion.Date","Community.Board", "Latitude", "Longitude",
+         "Reporting.Construction.Type",
+         "Prevailing.Wage.Status", 
+         "Extremely.Low.Income.Units", 
+         "Very.Low.Income.Units", "Low.Income.Units", "Moderate.Income.Units", "Middle.Income.Units",
+         "Other.Income.Units", "Borough", 
+         "Studio.Units","X1.BR.Units", "X2.BR.Units", "X3.BR.Units", "X4.BR.Units", "X5.BR.Units", 
          "X6.BR..Units", "Counted.Rental.Units", "Counted.Homeownership.Units", "All.Counted.Units","Total.Units")
 ```
 

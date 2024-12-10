@@ -1,1 +1,326 @@
 # Results
+
+# 1. Parallel Coordinate Plot
+```{r, include = FALSE, message = FALSE, warning = FALSE}
+library(readr)
+library(GGally)
+library(tidyr)
+library(forcats)
+library(ggplot2)
+library(dplyr)
+library(sf)
+```
+
+
+```{r}
+
+data <- read.csv("/Users/chaerinnoh/Desktop/Housing.csv")
+data <- data |> 
+  select("Project.ID", "Project.Start.Date", "Project.Completion.Date", "Borough", "Community.Board",
+         "Extremely.Low.Income.Units", "Reporting.Construction.Type", "Very.Low.Income.Units", "Low.Income.Units",
+         "Moderate.Income.Units", "Middle.Income.Units","Other.Income.Units", "Studio.Units","X1.BR.Units",
+         "X2.BR.Units", "X3.BR.Units", "X4.BR.Units", "X5.BR.Units", "X6.BR..Units", "Counted.Rental.Units",
+         "Counted.Homeownership.Units", "Total.Units")
+```
+
+
+
+```{r}
+ggparcoord(data, columns=13:19, groupColumn="Borough", alpha=0.3, scale='uniminmax',splineFactor=10, 
+           title = "Parallel coordinate plot for Housing Data")
+```
+While most of the lines are concentrated around lower values on the y-axis (near 0) we can see that 1BR and 2BR units are the most common housing types for all boroughs. This reflects their suitability for single-person households or small families, which make up a large proportion of NYC's population. Across all boroughs, larger units are relatively rare, highlighting a gap in housing availability for larger families.
+Bronx, Brooklyn, and Staten Island show more variation and higher spikes in 3BR and larger units. Manhattan has a lot of outliers in where there are a small number of bedroom units. 
+
+2. Bar plot of income proportion by borough
+```{r}
+
+income_proportions <- data |>
+  select(Borough, Extremely.Low.Income.Units, 
+         Very.Low.Income.Units, Low.Income.Units, Moderate.Income.Units,
+         Middle.Income.Units, Other.Income.Units) |>
+  group_by(Borough) |>
+  summarise(across(
+    Extremely.Low.Income.Units:Other.Income.Units,
+    ~ sum(.x, na.rm = TRUE)
+  )) |>
+  mutate(TotalUnits = rowSums(across(Extremely.Low.Income.Units:Other.Income.Units))) |>
+  mutate(across(
+    Extremely.Low.Income.Units:Other.Income.Units,
+    ~ .x / TotalUnits,
+    .names = "Proportion_{.col}"
+  )) |>
+  pivot_longer(
+    cols = starts_with("Proportion"),
+    names_to = "IncomeType",
+    values_to = "Proportion"
+  ) |>
+  mutate(
+      IncomeType = gsub("Proportion_", "", IncomeType),
+      IncomeType = fct_relevel(IncomeType, "Extremely.Low.Income.Units", "Very.Low.Income.Units",
+                               "Low.Income.Units",
+                               "Moderate.Income.Units", "Middle.Income.Units", "Other.Income.Units")
+    )
+
+income_colors <- c(
+  "Extremely.Low.Income.Units" = "#fde0dd",  
+  "Very.Low.Income.Units" = "#fcc5c0",     
+  "Low.Income.Units" = "#fa9fb5",       
+  "Moderate.Income.Units" = "#f768a1",    
+  "Middle.Income.Units" = "#dd3497",     
+  "Other.Income.Units" = "#49006a"          
+)
+
+ggplot(income_proportions, aes(x = IncomeType, y = Proportion, fill = IncomeType)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  facet_wrap(~ Borough) +
+  scale_fill_manual(
+    values = income_colors,  
+    name = "Income Type"
+  ) +
+  scale_y_continuous(labels = scales::percent_format()) +
+  labs(
+    title = "Income Proportions by Borough",
+    x = "Income Type",
+    y = "Proportion",
+    fill = "Income Type"
+  ) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+Here we look at the income proportions for each borough. Given that the dataset came from an affordable housing project, we can see that the proportions are high for very low income units and low income units for all boroughs. Bronx and Brooklyn show similar patterns, with a gradual increase of proportion from extremely low to low income types and a significant drop on moderate and the low proportion persists to the middle income units. Queens is also similar with the difference being that there are more propotions of moderate and middle income units. One standout observation is the overwhelming proportion of low income units in Staten Island, making up about 52%, with significantly smaller proportions in other income categories. In contrast, Manhattan has a more balanced distribution of income types, showing greater variability. This suggests that its housing developments aim to cater to a broader range of economic groups. 
+
+```{r}
+# Heatmap of Manhattan community board income units
+# ```{r}
+# manhattan_totals <- data |>
+#   filter(Borough == "Manhattan") |>
+#   group_by(Community.Board) |>
+#   summarise(
+#     TotalExtremelyLowIncome = sum(Extremely.Low.Income.Units, na.rm = TRUE),
+#     TotalVeryLowIncome = sum(Very.Low.Income.Units, na.rm = TRUE),
+#     TotalLowIncome = sum(Low.Income.Units, na.rm = TRUE),
+#     TotalModerateIncome = sum(Moderate.Income.Units, na.rm = TRUE),
+#     TotalMiddleIncome = sum(Middle.Income.Units, na.rm = TRUE)
+#   )
+# 
+# 
+# manhattan_long <- manhattan_totals |>
+#   pivot_longer(
+#     cols = starts_with("Total"),
+#     names_to = "IncomeType",
+#     values_to = "Count"
+#   )
+# 
+# ggplot(manhattan_long, aes(x = Community.Board, y = IncomeType, fill = Count)) +
+#   geom_tile() +
+#   scale_fill_gradient(low = "white", high = "blue") +
+#   labs(
+#     title = "Heatmap of Income Units by Manhattan Community Boards",
+#     x = "Community Board",
+#     y = "Income Type",
+#     fill = "Total Units"
+#   ) +
+#   theme_minimal() +
+#   theme(axis.text.x = element_text(angle = 45, hjust = 1))
+# 
+```
+# 3. Extremely low income units in Manhattan community boards with heatmap
+
+```{r, include = FALSE, message = FALSE, warning = FALSE }
+nyc_shapefile <- st_read("~/Desktop/Districts/geo_export_c0d8af41-79ac-4f04-92b7-535a92a2885e.shx")
+```
+
+
+```{r}
+manhattan_map <- nyc_shapefile |>
+  filter(boro_cd %in% 101:112)
+
+manhattan_totals <- data |>
+  filter(Borough == "Manhattan") |>
+  group_by(Community.Board) |>
+  summarise(
+    TotalExtremelyLowIncome = sum(Extremely.Low.Income.Units, na.rm = TRUE),
+    TotalVeryLowIncome = sum(Very.Low.Income.Units, na.rm = TRUE),
+    TotalLowIncome = sum(Low.Income.Units, na.rm = TRUE),
+    TotalModerateIncome = sum(Moderate.Income.Units, na.rm = TRUE),
+    TotalMiddleIncome = sum(Middle.Income.Units, na.rm = TRUE)
+  )
+
+manhattan_totals <- manhattan_totals |>
+  mutate(
+    boro_cd = as.numeric(sub("MN-", "1", Community.Board)) 
+  )
+
+manhattan_map_data <- manhattan_map |>
+  left_join(manhattan_totals, by = "boro_cd")
+
+ggplot(manhattan_map_data) +
+  geom_sf(aes(fill = TotalExtremelyLowIncome)) +
+  scale_fill_gradient(low = "white", high = "blue") +
+  labs(
+    title = "Heatmap of Extremely Low Income Units in Manhattan",
+    fill = "Units"
+  ) +
+  theme(
+    axis.text.x = element_text(angle = 45, hjust = 1)
+  )
+```
+Reference: https://statisticalatlas.com/county-subdivision/New-York/New-York-County/Manhattan/Household-Income
+
+This heatmap of extremely low-income units in Manhattan highlights the geographic disparities in affordable housing distribution. The darker shaded areas, such as District 11, which includes the neighborhoods of East Harlem and Randalls Island, have a higher concentration of extremely low-income units. In contrast, District 1, which encompasses the Financial District and Tribeca, shows a much smaller number of these units. According to reference data, the median household income in the Financial District and Tribeca (District 1) is $193,906, while East Harlem has a significantly lower median income of $37,468.
+
+
+<!-- # 3+ another heatmap of all columns -->
+<!-- ```{r} -->
+<!-- manhattan_totals <- manhattan_totals |> -->
+<!--   mutate( -->
+<!--     boro_cd = as.numeric(sub("MN-", "1", Community.Board)) -->
+<!--   ) |> -->
+<!--   pivot_longer( -->
+<!--     cols = starts_with("Total"), # Reshape income categories to long format -->
+<!--     names_to = "IncomeType", -->
+<!--     values_to = "Count" -->
+<!--   ) -->
+
+<!-- # Step 4: Merge reshaped data with spatial data -->
+<!-- manhattan_map_data <- manhattan_map |> -->
+<!--   left_join(manhattan_totals, by = "boro_cd") -->
+
+<!-- # Step 5: Create a faceted heatmap for all income categories -->
+<!-- ggplot(manhattan_map_data) + -->
+<!--   geom_sf(aes(fill = Count)) + -->
+<!--   scale_fill_gradient(low = "white", high = "blue") + -->
+<!--   facet_wrap(~ IncomeType) + -->
+<!--   labs( -->
+<!--     title = "Heatmap of Income Units in Manhattan by Category", -->
+<!--     fill = "Units" -->
+<!--   ) + -->
+<!--   theme_minimal() -->
+<!-- ``` -->
+
+
+# 
+
+```{r}
+manhattan_totals <- data |>
+  filter(Borough == "Manhattan") |>
+  group_by(Community.Board) |>
+  summarise(
+    TotalStudio = sum(Studio.Units, na.rm = TRUE),
+    Total1BR = sum(X1.BR.Units, na.rm = TRUE),
+    Total2BR = sum(X2.BR.Units, na.rm = TRUE),
+    Total3BR = sum(X3.BR.Units, na.rm = TRUE),
+    Total4BR = sum(X4.BR.Units, na.rm = TRUE),
+    Total5PlusBR = sum(X5.BR.Units, na.rm = TRUE)
+  )
+
+manhattan_long <- manhattan_totals |>
+  pivot_longer(
+    cols = starts_with("Total"),
+    names_to = "BedroomType",
+    values_to = "Count"
+  ) |>
+  mutate(
+    BedroomType = fct_relevel(BedroomType, 
+                              "TotalStudio", 
+                              "Total1BR", 
+                              "Total2BR", 
+                              "Total3BR", 
+                              "Total4BR", 
+                              "Total5PlusBR")
+  )
+
+ggplot(manhattan_long, aes(x = Community.Board, y = BedroomType, fill = Count)) +
+  geom_tile() +
+  scale_fill_gradient(low = "white", high = "blue") +
+  labs(
+    title = "Heatmap of Bedroom Units by Manhattan Community Boards",
+    x = "Community Board",
+    y = "Bedroom Type",
+    fill = "Total Units"
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+https://www.nyc.gov/site/planning/plans/voids-central/voids-central.page
+
+This graph shows the residential housing landscape in Manhattan. There are more number of smaller housing units (1BR and 2BR), reflecting the demand for housing suitable for individuals or small households. The concentration of units in District 11(MN-11) suggests that areas like East Harlem have been a focus for development, particularly for low- to moderate-income residents.
+
+On the other hand, areas like District 1 and 2 (MN-01, MN-02) have fewer housing units overall, possibly due to the dominance of commercial spaces or high-income luxury housing that may not cater to smaller or affordable units. (reference to link which shows the central business districts). Fewer number of larger units (3BR and above) across the borough may indicate the challenges of accommodating larger families in Manhattan’s housing market.
+
+
+### Map of NYC Community Districts by Dominant Income Units
+
+```{r}
+income_long <- data |>
+  pivot_longer(
+    cols = c(Extremely.Low.Income.Units, Very.Low.Income.Units, Low.Income.Units, 
+             Moderate.Income.Units, Middle.Income.Units, Other.Income.Units),
+    names_to = "Income.Unit",
+    values_to = "Proportion"
+  )
+
+highest_proportion <- income_long |>
+  group_by(Community.Board) |>
+  summarise(
+    Max_Proportion = max(Proportion, na.rm = TRUE),
+    Income_Unit = Income.Unit[which.max(Proportion)]
+  )
+
+nyc_shapefile <- nyc_shapefile |>
+  mutate(
+    Community.Board = case_when(
+      boro_cd >= 101 & boro_cd <= 112 ~ paste0("MN-", sprintf("%02d", boro_cd - 100)), 
+      boro_cd >= 201 & boro_cd <= 212 ~ paste0("BX-", sprintf("%02d", boro_cd - 200)), 
+      boro_cd >= 301 & boro_cd <= 318 ~ paste0("BK-", sprintf("%02d", boro_cd - 300)), 
+      boro_cd >= 401 & boro_cd <= 414 ~ paste0("QN-", sprintf("%02d", boro_cd - 400)), 
+      boro_cd >= 501 & boro_cd <= 503 ~ paste0("SI-", sprintf("%02d", boro_cd - 500)), 
+      TRUE ~ NA_character_
+    )
+  )
+
+merged_data <- nyc_shapefile |>
+  left_join(highest_proportion, by = "Community.Board")
+
+
+ggplot(merged_data) +
+  geom_sf(aes(fill = Income_Unit), color = "black", size = 0.1) +  
+  scale_fill_manual(
+    values = c(
+  "Extremely.Low.Income.Units" = "#fde0dd",  
+  "Very.Low.Income.Units" = "#fbb4b9",      
+  "Low.Income.Units" = "#f768a1",      
+  "Moderate.Income.Units" = "#c51b8a",   
+  "Middle.Income.Units" = "#7a0177",      
+  "Other.Income.Units" = "#49006a"          
+),
+    name = "Income Unit",
+    limits = c(  
+      "Extremely.Low.Income.Units",
+      "Very.Low.Income.Units",
+      "Low.Income.Units",
+      "Moderate.Income.Units",
+      "Middle.Income.Units",
+      "Other.Income.Units"
+    )
+  ) +
+  labs(
+    title = "NYC Community Districts by Dominant Income Unit",
+    subtitle = "District colored by highest proportion of income unit",
+  ) +
+  theme_minimal() +
+  theme(
+    legend.position = "right",  
+    legend.title = element_text(size = 12),  
+    legend.text = element_text(size = 10),  
+    plot.title = element_text(hjust = 0.5, size = 16),  
+    plot.subtitle = element_text(hjust = 0.5, size = 12),  
+    axis.text.x = element_text(angle = 45, hjust = 1)  
+  )
+
+```
+
+Each district is colored based on its dominant income unit category, showing housing trends across NYC. Many districts are dominated by "Extremely.Low.Income.Units" and "Very.Low.Income.Units". The clear differences between neighborhoods reveal housing inequalities, with lower-income units concentrated in certain areas. These difference points to broader economic disparities that affect access to housing for different income groups.
+
+
+
