@@ -212,39 +212,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="description" class="level2" data-number="2.1">
 <h2 data-number="2.1" class="anchored" data-anchor-id="description"><span class="header-section-number">2.1</span> Description</h2>
-<p>The project aims to analyze affordable housing units in NYC. The dataset originates from The Department of Housing Preservation and Development (HPD), a department of the government of NYC dedicated to ensuring quality and affordable housing while sustaining neighborhood strength and diversity.</p>
+<p>The project aims to analyze affordable housing units in NYC. The datasets originate from The Department of Housing Preservation and Development (HPD), a department of the government of NYC dedicated to ensuring quality and affordable housing while sustaining neighborhood strength and diversity.</p>
 <p>The dataset can be easily accessed by downloading the CSV file from https://data.cityofnewyork.us/Housing-Development/Affordable-Housing-Production-by-Building/hg8x-zxpr/about_data, which can be directed via the NYC Housing Preservation &amp; Development government website (https://www.nyc.gov/site/hpd/about/open-data.page).</p>
-<p>The dataset was compiled by HPD using various methods, including wage information for housing development projects as mandated by Local Law 44, registration details from owners of residential rental properties, and survey data from housing units across the city. It consists of 41 columns and 7,637 rows, with each row representing details of a housing development or preservation project. According to the HPD, the dataset was first made publicly available on December 20, 2016, and undergoes updates quarterly. The most recent update occurred on September 23, 2024.</p>
-<p>One notable issue with the dataset is the possible redundancy of buildings, as a single building may appear more than once if it was involved in multiple projects. This implies the need for data transformation during the cleaning process to address these duplicates.</p>
+<p>The dataset was compiled by HPD using various methods, including wage information for housing development projects as mandated by Local Law 44, registration details from owners of residential rental properties, and survey data from housing units across the city. It consists of 41 columns and 7,637 rows, with each row representing details of a housing development or preservation project. According to the HPD, the dataset was first published to the public on December 20, 2016. It undergoes quarterly updates and the most recent update occurred on September 23, 2024.</p>
+<p>One notable issue with the dataset is that some entries in the Project Completion Date column remain empty, indicating that the project is still ongoing. Therefore, it is necessary to manually input NA values to these empty entries.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(readr)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-<div class="cell-output cell-output-stderr">
-<pre><code>
-Attaching package: 'dplyr'</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>The following objects are masked from 'package:stats':
-
-    filter, lag</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>The following objects are masked from 'package:base':
-
-    intersect, setdiff, setequal, union</code></pre>
-</div>
-<details class="code-fold">
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>data <span class="ot">&lt;-</span> <span class="fu">read.csv</span>(<span class="st">"/Users/chrisyang/Downloads/Housing.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-</div>
-<div class="cell">
-<details class="code-fold">
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code> [1] "Project.ID"                         "Project.Name"                      
@@ -272,13 +247,14 @@ Attaching package: 'dplyr'</code></pre>
 </div>
 <p>Data Explanation</p>
 <p>This project does not require every column from the dataset, as its focus is on analyzing affordable housing units in NYC. Outlined below are the selected columns from the dataset that may be utilized for the project.</p>
+<p>Data: Affordable Housing Production by Building</p>
 <ol type="1">
+<li><p>Project.ID: unique numeric identifier assigned to each project by HPD.</p></li>
+<li><p>Project Start Date: date of the project loan or agreement closing.</p></li>
+<li><p>Project Completion Date: date that the last building in the project was completed. If the project has not yet completed, then the field is blank.</p></li>
 <li><p>Borough: borough where the building is located.</p></li>
 <li><p>Community Board: the New York City Community District where the building is located.</p></li>
-<li><p>Latitude: location of the property on the earth’s surface.</p></li>
-<li><p>Longitude: location of the property on the earth’s surface.</p></li>
 <li><p>Reporting.Construction.Type: indicates whether the building is categorized as ‘new construction’ or ‘preservation’ in Housing New York statistics.</p></li>
-<li><p>Prevailing.Wage.Status: indicates whether the project is subject to prevailing wage requirements</p></li>
 <li><p>Extremely Low Income Units: units with rents that are affordable to households earning 0 to 30% of the area median income</p></li>
 <li><p>Very Low Income Units: units with rents that are affordable to households earning 31 to 50% of the area median income</p></li>
 <li><p>Low Income Units: units with rents that are affordable to households earning 51 to 80% of the area median income</p></li>
@@ -294,87 +270,27 @@ Attaching package: 'dplyr'</code></pre>
 <li><p>6-BR+ Units: units with 6-bedrooms or more.</p></li>
 <li><p>Counted Rental Units: units in the building, counted toward the Housing New York plan, where assistance has been provided to landlords in exchange for a requirement for affordable units.</p></li>
 <li><p>Counted Homeownership Units: units in the building, counted toward the Housing New York Plan, where assistance has been provided directly to homeowners.</p></li>
-<li><p>All Counted Units: total number of affordable units, counted towards the Housing New York plan, that are in the building.</p></li>
 <li><p>Total Units: total number of units, affordable and market rate, in each building.</p></li>
 </ol>
-<div class="cell">
-<details class="code-fold">
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>data <span class="ot">&lt;-</span> data <span class="sc">|&gt;</span> </span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="st">"Borough"</span>, <span class="st">"Community.Board"</span>, <span class="st">"Latitude"</span>, <span class="st">"Longitude"</span>, <span class="st">"Extremely.Low.Income.Units"</span>, <span class="st">"Reporting.Construction.Type"</span>,</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>         <span class="st">"Prevailing.Wage.Status"</span>, <span class="st">"Very.Low.Income.Units"</span>, <span class="st">"Low.Income.Units"</span>, <span class="st">"Moderate.Income.Units"</span>, <span class="st">"Middle.Income.Units"</span>,</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>         <span class="st">"Other.Income.Units"</span>, <span class="st">"Studio.Units"</span>,<span class="st">"X1.BR.Units"</span>, <span class="st">"X2.BR.Units"</span>, <span class="st">"X3.BR.Units"</span>, <span class="st">"X4.BR.Units"</span>, <span class="st">"X5.BR.Units"</span>, </span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>         <span class="st">"X6.BR..Units"</span>, <span class="st">"Counted.Rental.Units"</span>, <span class="st">"Counted.Homeownership.Units"</span>, <span class="st">"All.Counted.Units"</span>,<span class="st">"Total.Units"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-</div>
 </section>
 <section id="missing-value-analysis" class="level2" data-number="2.2">
 <h2 data-number="2.2" class="anchored" data-anchor-id="missing-value-analysis"><span class="header-section-number">2.2</span> Missing value analysis</h2>
-<div class="cell">
-<details class="code-fold">
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-<div class="cell-output cell-output-stderr">
-<pre><code>── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
-✔ forcats   1.0.0     ✔ stringr   1.5.1
-✔ ggplot2   3.5.1     ✔ tibble    3.2.1
-✔ lubridate 1.9.3     ✔ tidyr     1.3.1
-✔ purrr     1.0.2     
-── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
-✖ dplyr::filter() masks stats::filter()
-✖ dplyr::lag()    masks stats::lag()
-ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors</code></pre>
-</div>
-<details class="code-fold">
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(mi)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-<div class="cell-output cell-output-stderr">
-<pre><code>Loading required package: Matrix
-
-Attaching package: 'Matrix'
-
-The following objects are masked from 'package:tidyr':
-
-    expand, pack, unpack
-
-Loading required package: stats4
-mi (Version 1.1, packaged: 2022-06-05 05:31:15 UTC; ben)
-mi  Copyright (C) 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015 Trustees of Columbia University
-This program comes with ABSOLUTELY NO WARRANTY.
-This is free software, and you are welcome to redistribute it
-under the General Public License version 2 or later.
-Execute RShowDoc('COPYING') for details.
-
-Attaching package: 'mi'
-
-The following object is masked from 'package:tidyr':
-
-    complete</code></pre>
-</div>
-<details class="code-fold">
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(Matrix)</span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(redav)</span>
-<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-</div>
+<p>Data 1: Affordable Housing Production by Building</p>
 <p>To examine patterns in missing values, we begin by determining the count of NAs in each column.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>NA_per_column <span class="ot">&lt;-</span> <span class="fu">colSums</span>(<span class="fu">is.na</span>(data)) <span class="sc">|&gt;</span> <span class="fu">sort</span>(<span class="at">decreasing =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>NA_per_column</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>NA_per_column <span class="ot">&lt;-</span> <span class="fu">colSums</span>(<span class="fu">is.na</span>(data)) <span class="sc">|&gt;</span> <span class="fu">sort</span>(<span class="at">decreasing =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>NA_per_column</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
-<pre><code>                   Latitude                   Longitude 
-                       1531                        1531 
-                    Borough             Community.Board 
+<pre><code>    Project.Completion.Date                  Project.ID 
+                       1633                           0 
+         Project.Start.Date                     Borough 
                           0                           0 
- Extremely.Low.Income.Units Reporting.Construction.Type 
+            Community.Board  Extremely.Low.Income.Units 
                           0                           0 
-     Prevailing.Wage.Status       Very.Low.Income.Units 
+Reporting.Construction.Type       Very.Low.Income.Units 
                           0                           0 
            Low.Income.Units       Moderate.Income.Units 
                           0                           0 
@@ -388,31 +304,16 @@ The following object is masked from 'package:tidyr':
                           0                           0 
                X6.BR..Units        Counted.Rental.Units 
                           0                           0 
-Counted.Homeownership.Units           All.Counted.Units 
-                          0                           0 
-                Total.Units 
-                          0 </code></pre>
+Counted.Homeownership.Units                 Total.Units 
+                          0                           0 </code></pre>
 </div>
 </div>
-<p>The Latitude and Longitude columns each have 1,531 missing values.</p>
+<p>The Project.Completion.Date column has 1,633 missing entries.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">missing_data.frame</span>(data)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-<div class="cell-output cell-output-stdout">
-<pre><code>NOTE: The following pairs of variables appear to have the same missingness pattern.
- Please verify whether they are in fact logically distinct variables.
-     [,1]       [,2]       
-[1,] "Latitude" "Longitude"</code></pre>
-</div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Warning in .local(.Object, ...): Counted.Rental.Units and All.Counted.Units have the same rank ordering.
- Please verify whether they are in fact distinct variables.</code></pre>
-</div>
-<details class="code-fold">
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="fu">missing_data.frame</span>(data)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] "missing_data.frame"
@@ -423,32 +324,41 @@ attr(,"package")
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co"># x@patterns</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-</div>
-<div class="cell">
-<details class="code-fold">
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">levels</span>(x<span class="sc">@</span>patterns)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">levels</span>(x<span class="sc">@</span>patterns)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] "nothing"             "Latitude, Longitude"</code></pre>
+<pre><code>[1] "nothing"                 "Project.Completion.Date"</code></pre>
 </div>
 </div>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(x<span class="sc">@</span>patterns)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(x<span class="sc">@</span>patterns)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output cell-output-stdout">
-<pre><code>            nothing Latitude, Longitude 
-               6106                1531 </code></pre>
+<pre><code>                nothing Project.Completion.Date 
+                   6004                    1633 </code></pre>
 </div>
 </div>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">image</span>(x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">image</span>(x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="data_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>To uncover potential patterns among these NAs, we analyzed the data and plotted a heatmap of them by utilizing the “mi” package, which is particularly useful for datasets with a large number of rows.</p>
+<p>The dark areas of the figure represent missing values. The figure does not suggest a possible pattern related to data collection issues since there is only one column with NA values.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_missing</span>(data, <span class="at">max_cols =</span> <span class="dv">3</span>, <span class="at">percent =</span> <span class="cn">FALSE</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div>
@@ -458,12 +368,27 @@ attr(,"package")
 </div>
 </div>
 </div>
-<p>To uncover potential patterns among these NAs, we analyzed the data and plotted a heatmap of them by utilizing the “mi” package, which is particularly useful for datasets with a large number of rows.</p>
-<p>The dark areas of the figure represent missing values. Our analysis revealed that these NA values originated from the same rows. Specifically, all 1,531 missing values in the Latitude column also corresponded to missing values in the Longitude columns. The cluster within specific observations suggests a possible pattern related to data collection issues or specific subsets in the dataset.</p>
+<p>Another visualization reveals the same pattern of the NA values. Approximately 6,000 rows have complete data across the columns, while around 1,500 rows have missing values in the Project Completion Date column.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
-<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot_missing</span>(data, <span class="at">max_cols =</span> <span class="dv">5</span>, <span class="at">percent =</span> <span class="cn">FALSE</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>all_boroughs <span class="ot">&lt;-</span> <span class="fu">unique</span>(data<span class="sc">$</span>Project.Completion.Date)</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>NA_grouping <span class="ot">&lt;-</span> data <span class="sc">|&gt;</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Borough) <span class="sc">|&gt;</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">num_rows =</span> <span class="fu">n</span>(),</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">NA_num =</span> <span class="fu">sum</span>(<span class="fu">is.na</span>(Project.Completion.Date)),</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">NA_percent =</span> (NA_num <span class="sc">/</span> num_rows) <span class="sc">*</span> <span class="dv">100</span></span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(NA_grouping, <span class="fu">aes</span>(<span class="at">x =</span> Borough, <span class="at">y =</span> NA_percent, <span class="at">fill =</span> Borough)) <span class="sc">+</span></span>
+<span id="cb13-12"><a href="#cb13-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">"identity"</span>) <span class="sc">+</span></span>
+<span id="cb13-13"><a href="#cb13-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb13-14"><a href="#cb13-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Percentage of NA Values in Project Completion Date Column by Borough"</span>,</span>
+<span id="cb13-15"><a href="#cb13-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Borough"</span>,</span>
+<span id="cb13-16"><a href="#cb13-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Percentage of NA Values"</span></span>
+<span id="cb13-17"><a href="#cb13-17" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div>
@@ -473,37 +398,7 @@ attr(,"package")
 </div>
 </div>
 </div>
-<p>Another visualization reveals the same pattern of the NA values. Approximately 6,000 rows have complete data across the columns, while around 1,500 rows have missing values in the Longitude and Latitude columns. The visualization highlights that the NA values in these two columns consistently originate from the same rows.</p>
-<div class="cell">
-<details class="code-fold">
-<summary>Code</summary>
-<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>all_boroughs <span class="ot">&lt;-</span> <span class="fu">unique</span>(data<span class="sc">$</span>Borough)</span>
-<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>NA_grouping <span class="ot">&lt;-</span> data <span class="sc">|&gt;</span></span>
-<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(Borough) <span class="sc">|&gt;</span></span>
-<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(</span>
-<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">num_rows =</span> <span class="fu">n</span>(),</span>
-<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">NA_num =</span> <span class="fu">sum</span>(<span class="fu">is.na</span>(Latitude)),</span>
-<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">NA_percent =</span> (NA_num <span class="sc">/</span> num_rows) <span class="sc">*</span> <span class="dv">100</span></span>
-<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>  )</span>
-<span id="cb28-10"><a href="#cb28-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb28-11"><a href="#cb28-11" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(NA_grouping, <span class="fu">aes</span>(<span class="at">x =</span> Borough, <span class="at">y =</span> NA_percent, <span class="at">fill =</span> Borough)) <span class="sc">+</span></span>
-<span id="cb28-12"><a href="#cb28-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">"identity"</span>) <span class="sc">+</span></span>
-<span id="cb28-13"><a href="#cb28-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
-<span id="cb28-14"><a href="#cb28-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Percentage of NA Values in Latitude &amp; Longitude Column by Borough"</span>,</span>
-<span id="cb28-15"><a href="#cb28-15" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Borough"</span>,</span>
-<span id="cb28-16"><a href="#cb28-16" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Percentage of NA Values"</span></span>
-<span id="cb28-17"><a href="#cb28-17" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-</details>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="data_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
-</div>
-<p>To determine whether missing values in the Latitude and Longitude columns are correlated with values of another variable, we analyzed the percentage of NA values by borough (Bronx, Brooklyn, Manhattan, Queens, and Staten Island). The results reveal that Staten Island marked the highest rate of NA values for both columns (approximately 87%) while Manhattan had the lowest proportion (approximately 4%). This analysis highlights a clear geographic trend in the missing data, with Staten Island and Queens emerging as the most problematic boroughs and Manhattan being the least affected.</p>
+<p>To determine whether missing values in the Project.Completion.Date column are correlated with values of another variable, we analyzed the percentage of NA values by borough (Bronx, Brooklyn, Manhattan, Queens, and Staten Island). The results reveal that Queens marked the highest rate of NA values for both columns (approximately 32%) while Staten Island had the lowest proportion (approximately 2-3%). The rest of the boroughs marked approximately equal rate of NA values at around 20%. This analysis may highlight a clear geographic trend in the missing data, with Queens emerging as the most problematic borough with ongoing projects and Staten Island being the least affected with most of projects completed. It might also suggest that the number of projects varies significantly between boroughs.</p>
 
 
 </section>

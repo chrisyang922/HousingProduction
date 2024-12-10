@@ -1,1 +1,239 @@
 # Results
+
+```{r, include = FALSE, message = FALSE, warning = FALSE}
+library(readr)
+library(dplyr)
+library(ggplot2)
+library(tidyr)
+library(lubridate)
+
+data <- read.csv("/Users/chrisyang/Downloads/Housing.csv")
+
+data <- data |> 
+  select("Project.ID", "Project.Start.Date", "Project.Completion.Date", "Borough", "Community.Board",
+         "Extremely.Low.Income.Units", "Reporting.Construction.Type", "Very.Low.Income.Units", "Low.Income.Units",
+         "Moderate.Income.Units", "Middle.Income.Units","Other.Income.Units", "Studio.Units","X1.BR.Units",
+         "X2.BR.Units", "X3.BR.Units", "X4.BR.Units", "X5.BR.Units", "X6.BR..Units", "Counted.Rental.Units",
+         "Counted.Homeownership.Units", "Total.Units")
+
+data$"Project.Start.Date" <- as.Date(data$"Project.Start.Date", format = "%m/%d/%Y")
+data$"Project.Completion.Date" <- as.Date(data$"Project.Completion.Date", format = "%m/%d/%Y")
+data$Start.Year <- format(data$"Project.Start.Date", "%Y")
+data$Start.Month <- format(data$"Project.Start.Date", "%m")
+data$Start.Day <- format(data$"Project.Start.Date", "%d")
+data <- data |>
+  mutate(ProjectDuration = as.numeric(Project.Completion.Date - Project.Start.Date))
+data
+```
+
+```{r, warning = FALSE}
+ProportionData <- data |>
+  group_by(Start.Year) |>
+  summarise(
+    "Rental" = sum(Counted.Rental.Units, na.rm = TRUE),
+    "Homeownership" = sum(Counted.Homeownership.Units, na.rm = TRUE)
+  )
+
+ProportionData <- ProportionData |>
+  pivot_longer(
+    cols = c("Rental", "Homeownership"),
+    names_to = "Type",
+    values_to = "Value"
+  )
+
+ProportionData$Start.Year <- as.numeric(ProportionData$Start.Year)
+
+ggplot(ProportionData, aes(x = Start.Year, y = Value, color = Type)) +
+  geom_line(size = 1) + 
+  geom_point(size = 2) + 
+  scale_x_continuous(breaks = seq(2014, 2024, 1), limits = c(2014, 2024)) +
+  labs(
+    title = "Time Series of Rental and Homeownership Units",
+    x = "Year",
+    y = "Number of Units",
+    color = "Type"
+  ) +
+  theme_minimal() +
+  theme(legend.title = element_blank())
+```
+
+This figure displays the number of homeownership units (red line) and rental (blue line) units from 2014 to 2024. It reveals that the rental units outnumber homeownership units across all the time period covered by the dataset.
+
+Rental units show a consistent upward trend from 2014 to 2018, where it reaches its peek at about 35,000 units. Following 2019, the number of rental units fluctuate with the steepest decrease in 2022 and 2024.
+
+Similarly, homeownership units also display increasing trend from 2015 to 2018. After reaching its peak at about 18,000 units in 2020, it decreases significantly until 2022.
+
+Both types of units decreasing significantly in 2021 and 2022 might suggest that the Covid-19 pandemic had a negative influence on these units.
+
+Article: https://www.cssny.org/news/entry/nycha-pandemic-impacts-on-public-housing-residents
+
+```{r, warning = FALSE}
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+
+ProportionData <- data |>
+  group_by(Start.Year) |>
+  summarise(
+    "Rental" = sum(Counted.Rental.Units, na.rm = TRUE),
+    "Homeownership" = sum(Counted.Homeownership.Units, na.rm = TRUE)
+  )
+
+ProportionData <- ProportionData |>
+  pivot_longer(
+    cols = c("Rental", "Homeownership"),
+    names_to = "Type",
+    values_to = "Value"
+  )
+
+ProportionData <- ProportionData |>
+  group_by(Type) |>
+  mutate(scaledVal = (Value - min(Value)) / (max(Value) - min(Value)))
+
+ProportionData$Start.Year <- as.numeric(ProportionData$Start.Year)
+
+ggplot(ProportionData, aes(x = Start.Year, y = scaledVal, color = Type)) +
+  geom_line(size = 1) + 
+  geom_point(size = 2) + 
+  scale_x_continuous(breaks = seq(2014, 2024, 1), limits = c(2014, 2024)) +
+  labs(
+    title = "Scaled Time Series of Rental and Homeownership Units",
+    x = "Year",
+    y = "Scaled Number of Units",
+    color = "Type"
+  ) +
+  theme_minimal() +
+  theme(legend.title = element_blank())
+
+```
+
+This visualization is a standardized version of the figure above using uniminmax scaling to fit within the range of 0 and 1. It allows easier comparison between the relative trends of homeownership and rental units.
+
+Both types of units follow the same pattern of increase or decrease from 2015 to 2023 despite the difference in their relative percentages. In general, the relative trends for rental units are higher compared to homeownership units across most of the observed period.
+
+```{r}
+ProportionData <- data |>
+  filter(Start.Year >= 2018 & Start.Year <= 2022) |>
+  mutate(Start.Month = as.numeric(Start.Month)) |>
+  group_by(Start.Year, Start.Month) |>
+  summarise(
+    "Rental" = sum(Counted.Rental.Units, na.rm = TRUE),
+    "Homeownership" = sum(Counted.Homeownership.Units, na.rm = TRUE),
+    .groups = "drop"
+  ) |>
+  pivot_longer(
+    cols = c("Rental", "Homeownership"),
+    names_to = "Type",
+    values_to = "Value"
+  ) |>
+  arrange(Start.Year, Start.Month) |>
+  group_by(Start.Year, Type) |>
+  mutate(Cumulative_Value = cumsum(Value))
+
+ggplot(ProportionData, aes(x = Start.Month, y = Cumulative_Value, color = as.factor(Start.Year), group = Start.Year)) +
+  geom_line(size = 1) +
+  geom_point(size = 2) +
+  scale_x_continuous(breaks = 1:12, labels = month.abb) +
+  labs(
+    title = "CDF of Rental and Homeownership Units from 2018 to 2022",
+    x = "Month",
+    y = "Sum of Housing Units",
+    color = "Year") +
+  facet_wrap(~ Type) + 
+  theme_minimal() +
+  theme(
+    legend.position = "bottom",
+    axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+This graph depicts the CDF of rental and homeownership units from 2018 to 2022, highlighting monthly patterns during the period of steepest fluctuations. Consistent with the first figure, it shows that the rental units outnumber homeownership units.
+
+Over these five years, both homeownership and rental units usually experienced a rapid increase in cumulative units in June, except for 2020, which saw the highest increase in March. After the steep slope, the growth of homeownership units flattens for majority of the months while the rental units exhibits smaller monthly increments later in the year. The quarterly data update explains the significant increases in March, June, September, and December.
+
+```{r, include = FALSE, message = FALSE, warning = FALSE}
+constructionData <- data |>
+  filter(Reporting.Construction.Type == "New Construction") 
+
+constructionData <- constructionData |>
+  filter(ProjectDuration != 0)
+
+constructionData$"Start.Year" <- as.numeric(constructionData$"Start.Year")
+
+constructionGraphData <- constructionData |>
+  group_by(Borough, Start.Year) |>
+  summarise(
+    proportionSum = 
+      sum(Studio.Units, na.rm = TRUE) + 
+      sum(X1.BR.Units, na.rm = TRUE) + 
+      sum(X2.BR.Units, na.rm = TRUE) + 
+      sum(X3.BR.Units, na.rm = TRUE) + 
+      sum(X4.BR.Units, na.rm = TRUE) + 
+      sum(X5.BR.Units, na.rm = TRUE) + 
+      sum(X6.BR..Units, na.rm = TRUE)  
+  ) |>
+  ungroup()
+
+ggplot(constructionGraphData, aes(x = Start.Year, y = proportionSum, color = Borough)) +
+  geom_line(size = 1) +
+  geom_point(size = 2) +
+  labs(
+    title = "Time Series of Newly Constructed Units by Borough",
+    x = "Newly Constructed Units",
+    y = "Adjusted Unit Proportion",
+    color = "Borough"
+  ) +
+  scale_x_continuous(breaks = seq(2014, 2024, 1), limits = c(2014, 2024)) +
+  theme_minimal() +
+  theme(legend.title = element_blank())
+```
+
+This figure presents the annual number of newly constructed housing units across the five boroughs of New York, providing insights into the temporal and spatial distribution of housing development. It highlights boroughs with the highest number of new units and the decline in construction activity in the most recent years (post 2020). Overall, Brooklyn and Bronx consistently mark the highest levels of construction activity annually while Staten Island records the lowest.
+
+```{r, include = FALSE, message = FALSE, warning = FALSE}
+newConstructionData <- constructionData |>
+  pivot_longer(
+    cols = c("Studio.Units", "X1.BR.Units", "X2.BR.Units", "X3.BR.Units", 
+             "X4.BR.Units", "X5.BR.Units", "X6.BR..Units"),  
+    names_to = "UnitType",
+    values_to = "Proportion"
+  )
+      
+newConstructionGraph <- newConstructionData |>
+  group_by(Borough, Start.Year, UnitType) |>
+  summarise(Proportion = sum(Proportion, na.rm = TRUE)) |>
+  ungroup()
+
+newConstructionGraph$Start.Year <- as.numeric(newConstructionGraph$Start.Year)
+
+ggplot(newConstructionGraph, aes(x = Start.Year, y = Proportion, color = Borough)) +
+  geom_line(size = 1) +
+  geom_point(size = 2) +
+  facet_wrap(~ UnitType, scales = "free_y") +  
+  labs(
+    title = "Time Series of Proportion of Newly Constructed Units by Borough and Unit Type",
+    x = "Start Year",
+    y = "Newly Constructed Units",
+    color = "Borough"
+  ) +
+  scale_x_continuous(breaks = seq(2014, 2024, 1), limits = c(2014, 2024)) +
+  theme_minimal() +
+  theme(legend.title = element_blank())
+```
+
+Focusing on the number of newly constructed units per unit type (studio, one bedroom, ..., six or more bedrooms), the figure above breaks the previous graph into facets. The trend of Bronx and Brooklyn marking the highest construction activity and Staten Island having the lowest persist across all the unit types, implying that the proportion of newly constructed units are same across the five boroughs. Notably, no units with five or more bedrooms were newly constructed within the time period covered by the data.
+
+```{r, warning = FALSE}
+constructionData <- constructionData |>
+  filter(ProjectDuration != 0)
+
+ggplot(constructionData, aes(x = ProjectDuration, y = Total.Units)) +
+  geom_point(size = 1, alpha = 0.2) +
+  facet_wrap(~ Borough) +
+  labs(
+    title = "Scatterplot of Project Duration vs Total Housing Units by Borough",
+    x = "Project Duration (Days)",
+    y = "Total Units"
+  ) +
+  theme_minimal()
+```
+This scatterplot examines the relationship between project duration (in days) and the total number of housing units for each construction project across the five boroughs. By visualizing these patterns, we aim to compare housing construction patterns and identify borough specific trends. As concluded from the previous figure, Staten Island recorded the fewest number of newly constructed units, preventing us from drawing meaningful conclusions for that borough. Across all boroughs, most construction projects ended within 1,000 days while a few extending between 1,000 days to 2,000 days.
