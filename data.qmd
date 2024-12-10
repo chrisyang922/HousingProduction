@@ -6,11 +6,11 @@ The project aims to analyze affordable housing units in NYC. The dataset origina
 
 The dataset can be easily accessed by downloading the CSV file from https://data.cityofnewyork.us/Housing-Development/Affordable-Housing-Production-by-Building/hg8x-zxpr/about_data, which can be directed via the NYC Housing Preservation & Development government website (https://www.nyc.gov/site/hpd/about/open-data.page). 
 
-The dataset was compiled by HPD using various methods, including wage information for housing development projects as mandated by Local Law 44, registration details from owners of residential rental properties, and survey data from housing units across the city. It consists of 41 columns and 7,637 rows, with each row representing details of a housing development or preservation project. According to the HPD, the dataset was first made publicly available on December 20, 2016, and undergoes updates quarterly. The most recent update occurred on September 23, 2024. 
+The dataset was compiled by HPD using various methods, including wage information for housing development projects as mandated by Local Law 44, registration details from owners of residential rental properties, and survey data from housing units across the city. It consists of 41 columns and 7,637 rows, with each row representing details of a housing development or preservation project. According to the HPD, the dataset was first published to the public on December 20, 2016. It undergoes quarterly updates and the most recent update occurred on September 23, 2024.
 
-One notable issue with the dataset is the possible redundancy of buildings, as a single building may appear more than once if it was involved in multiple projects. This implies the need for data transformation during the cleaning process to address these duplicates.
+One notable issue with the dataset is that some entries in the Project Completion Date column remain empty, indicating that the project is still ongoing. Therefore, it is necessary to manually input NA values to these empty entries.
 
-```{r}
+```{r, include = FALSE, message = FALSE, warning = FALSE}
 library(readr)
 library(dplyr)
 data <- read.csv("/Users/chrisyang/Downloads/Housing.csv")
@@ -20,22 +20,23 @@ data <- read.csv("/Users/chrisyang/Downloads/Housing.csv")
 colnames(data)
 ```
 
-
 Data Explanation 
 
 This project does not require every column from the dataset, as its focus is on analyzing affordable housing units in NYC. Outlined below are the selected columns from the dataset that may be utilized for the project.
 
-1. Borough: borough where the building is located.
+Data: Affordable Housing Production by Building
 
-2. Community Board: the New York City Community District where the building is located.
+1. Project.ID: unique numeric identifier assigned to each project by HPD.
 
-3. Latitude: location of the property on the earth’s surface. 
+2. Project Start Date: date of the project loan or agreement closing.
 
-4. Longitude: location of the property on the earth’s surface. 
+3. Project Completion Date: date that the last building in the project was completed. If the project has not yet completed, then the field is blank.
 
-5. Reporting.Construction.Type: indicates whether the building is categorized as ‘new construction’ or ‘preservation’ in Housing New York statistics.
+4. Borough: borough where the building is located.
 
-6. Prevailing.Wage.Status: indicates whether the project is subject to prevailing wage requirements
+5. Community Board: the New York City Community District where the building is located.
+
+6. Reporting.Construction.Type: indicates whether the building is categorized as ‘new construction’ or ‘preservation’ in Housing New York statistics.
 
 7. Extremely Low Income Units: units with rents that are affordable to households earning 0 to 30% of the area median income 
 
@@ -67,22 +68,25 @@ This project does not require every column from the dataset, as its focus is on 
 
 21. Counted Homeownership Units: units in the building, counted toward the Housing New York Plan, where assistance has been provided directly to homeowners.
 
-22. All Counted Units: total number of affordable units, counted towards the Housing New York plan, that are in the building.
+22. Total Units: total number of units, affordable and market rate, in each building.
 
-23. Total Units: total number of units, affordable and market rate, in each building.
-
-```{r}
+```{r, include = FALSE, message = FALSE, warning = FALSE}
 data <- data |> 
-  select("Borough", "Community.Board", "Latitude", "Longitude", "Extremely.Low.Income.Units", "Reporting.Construction.Type",
-         "Prevailing.Wage.Status", "Very.Low.Income.Units", "Low.Income.Units", "Moderate.Income.Units", "Middle.Income.Units",
-         "Other.Income.Units", "Studio.Units","X1.BR.Units", "X2.BR.Units", "X3.BR.Units", "X4.BR.Units", "X5.BR.Units", 
-         "X6.BR..Units", "Counted.Rental.Units", "Counted.Homeownership.Units", "All.Counted.Units","Total.Units")
+  select("Project.ID", "Project.Start.Date", "Project.Completion.Date", "Borough", "Community.Board",
+         "Extremely.Low.Income.Units", "Reporting.Construction.Type", "Very.Low.Income.Units", "Low.Income.Units",
+         "Moderate.Income.Units", "Middle.Income.Units","Other.Income.Units", "Studio.Units","X1.BR.Units",
+         "X2.BR.Units", "X3.BR.Units", "X4.BR.Units", "X5.BR.Units", "X6.BR..Units", "Counted.Rental.Units",
+         "Counted.Homeownership.Units", "Total.Units")
+
+data$Project.Completion.Date[data$Project.Completion.Date == ""] <- NA
 ```
 
 
-
 ## Missing value analysis
-```{r}
+
+Data 1: Affordable Housing Production by Building
+
+```{r, include = FALSE, message = FALSE, warning = FALSE}
 library(tidyverse)
 library(mi)
 library(Matrix)
@@ -97,16 +101,11 @@ To examine patterns in missing values, we begin by determining the count of NAs 
 NA_per_column <- colSums(is.na(data)) |> sort(decreasing = TRUE)
 NA_per_column
 ```
-The Latitude and Longitude columns each have 1,531 missing values.
+The Project.Completion.Date column has 1,633 missing entries.
 
-```{r}
+```{r, warning = FALSE}
 x <- missing_data.frame(data)
 class(x)
-```
-
-
-```{r}
-# x@patterns
 ```
 
 ```{r}
@@ -123,33 +122,33 @@ image(x)
 
 To uncover potential patterns among these NAs, we analyzed the data and plotted a heatmap of them by utilizing the "mi" package, which is particularly useful for datasets with a large number of rows.
 
-The dark areas of the figure represent missing values. Our analysis revealed that these NA values originated from the same rows. Specifically, all 1,531 missing values in the Latitude column also corresponded to missing values in the Longitude columns. The cluster within specific observations suggests a possible pattern related to data collection issues or specific subsets in the dataset.
+The dark areas of the figure represent missing values. The figure does not suggest a possible pattern related to data collection issues since there is only one column with NA values.
 
 ```{r}
-plot_missing(data, max_cols = 5, percent = FALSE) 
+plot_missing(data, max_cols = 3, percent = FALSE) 
 ```
 
-Another visualization reveals the same pattern of the NA values. Approximately 6,000 rows have complete data across the columns, while around 1,500 rows have missing values in the Longitude and Latitude columns. The visualization highlights that the NA values in these two columns consistently originate from the same rows.
+Another visualization reveals the same pattern of the NA values. Approximately 6,000 rows have complete data across the columns, while around 1,500 rows have missing values in the Project Completion Date column.
+
 
 ```{r}
-all_boroughs <- unique(data$Borough)
+all_boroughs <- unique(data$Project.Completion.Date)
 
 NA_grouping <- data |>
   group_by(Borough) |>
   summarize(
     num_rows = n(),
-    NA_num = sum(is.na(Latitude)),
+    NA_num = sum(is.na(Project.Completion.Date)),
     NA_percent = (NA_num / num_rows) * 100
   )
 
 ggplot(NA_grouping, aes(x = Borough, y = NA_percent, fill = Borough)) +
   geom_bar(stat = "identity") +
   labs(
-    title = "Percentage of NA Values in Latitude & Longitude Column by Borough",
+    title = "Percentage of NA Values in Project Completion Date Column by Borough",
     x = "Borough",
     y = "Percentage of NA Values"
   )
 ```
 
-To determine whether missing values in the Latitude and Longitude columns are correlated with values of another variable, we analyzed the percentage of NA values by borough (Bronx, Brooklyn, Manhattan, Queens, and Staten Island). The results reveal that Staten Island marked the highest rate of NA values for both columns (approximately 87%) while Manhattan had the lowest proportion (approximately 4%). This analysis highlights a clear geographic trend in the missing data, with Staten Island and Queens emerging as the most problematic boroughs and Manhattan being the least affected.
-
+To determine whether missing values in the Project.Completion.Date column are correlated with values of another variable, we analyzed the percentage of NA values by borough (Bronx, Brooklyn, Manhattan, Queens, and Staten Island). The results reveal that Queens marked the highest rate of NA values for both columns (approximately 32%) while Staten Island had the lowest proportion (approximately 2-3%). The rest of the boroughs marked approximately equal rate of NA values at around 20%. This analysis may highlight a clear geographic trend in the missing data, with Queens emerging as the most problematic borough with ongoing projects and Staten Island being the least affected with most of projects completed. It might also suggest that the number of projects varies significantly between boroughs. 
