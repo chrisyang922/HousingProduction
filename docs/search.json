@@ -58,5 +58,55 @@
     "crumbs": [
       "<span class='chapter-number'>4</span>  <span class='chapter-title'>Interactive graph</span>"
     ]
+  },
+  {
+    "objectID": "conclusion.html",
+    "href": "conclusion.html",
+    "title": "5  Conclusion",
+    "section": "",
+    "text": "5.1 Main Takeaways",
+    "crumbs": [
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>Conclusion</span>"
+    ]
+  },
+  {
+    "objectID": "conclusion.html#main-takeaways",
+    "href": "conclusion.html#main-takeaways",
+    "title": "5  Conclusion",
+    "section": "",
+    "text": "1BR and 2BR units are the most common housing types across all boroughs, reflecting their suitability for smaller households, such as individuals or small family households, that make up a large proportion of NYC’s population.\nThere is a significant portion on Very Low-Income and Low-Income Units across boroughs, highlighting the city’s efforts to address housing affordability for economically disadvantaged populations.\nExtremely Low-Income Units make up a smaller proportion across all boroughs, suggesting that New York City may not be adequately addressing the housing needs of its most vulnerable residents.\nAmong the five boroughs of New York, Bronx and Brooklyn marked the highest number of newly constructed units from 2014 to 2024. The larger land areas compared to other boroughs may have significantly contributed in facilitating greater housing development.\nHomeownership and rental units follow a similar pattern of rise and decline despite differences in their relative percentages, suggesting a strong positive correlation among the two types of housing units.",
+    "crumbs": [
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>Conclusion</span>"
+    ]
+  },
+  {
+    "objectID": "conclusion.html#limiatations",
+    "href": "conclusion.html#limiatations",
+    "title": "5  Conclusion",
+    "section": "5.2 Limiatations",
+    "text": "5.2 Limiatations\nThe data focuses on housing tied to an affordable housing project, which may not represent the whole NYC’s housing market or include privately developed or market-rate housings. In addition, the graphs do not account for variations in household size, income level, or demographics, which are factors that can influence housing demand for specific unit types. Borough comparisons may oversimplify the unique socioeconomic and geographic factors influencing housing distributions within each borough.",
+    "crumbs": [
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>Conclusion</span>"
+    ]
+  },
+  {
+    "objectID": "conclusion.html#future-directions",
+    "href": "conclusion.html#future-directions",
+    "title": "5  Conclusion",
+    "section": "5.3 Future Directions",
+    "text": "5.3 Future Directions\nIn the future, we can include market-rate housing data to get a more comprehensive understanding of New York City’s housing landscape. Additionally, adding information on income levels, household size, and demographics would enable a more detailed exploration. For a deeper analysis, we could go beyond borough-level trends to neighborhoods or community districts for a more localized perspective. Furthermore, examining the impact of gentrification and displacement on housing availability and affordability across boroughs would offer valuable insights.",
+    "crumbs": [
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>Conclusion</span>"
+    ]
+  },
+  {
+    "objectID": "conclusion.html#lessons-learned",
+    "href": "conclusion.html#lessons-learned",
+    "title": "5  Conclusion",
+    "section": "5.4 Lessons Learned",
+    "text": "5.4 Lessons Learned\nDuring the project, we realized the importance of regularly backing up files and keeping our workflow updated on GitHub. At one point, we accidentally saved an incorrect version of the file, which could have required us to spend time reproducing the lost code. Fortunately, GitHub allowed us to successfully restart from the previous checkpoint, saving both time and effort.\nIn addition, when working with the map of NYC (shapefile) and our data, we had difficulties linking the community districts because the labeling conventions were different. The map used numeric labels (e.g., 101-112), while our dataset used alphanumeric labels (e.g., MN-01). This mismatch made it challenging to align the two datasets and required additional steps to create a mapping between them. Through this experience, we learned the importance of using clear, consistent, and well-documented labeling systems when preparing datasets. By specifying the labeling conventions and including guides, we can make our data more accessible and user-friendly for others who may work with it in the future.",
+    "crumbs": [
+      "<span class='chapter-number'>5</span>  <span class='chapter-title'>Conclusion</span>"
+    ]
   }
 ]
