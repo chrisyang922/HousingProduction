@@ -212,7 +212,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="description" class="level2" data-number="2.1">
 <h2 data-number="2.1" class="anchored" data-anchor-id="description"><span class="header-section-number">2.1</span> Description</h2>
-<p>The project aims to analyze affordable housing units in NYC. The datasets originate from The Department of Housing Preservation and Development (HPD), a department of the government of NYC dedicated to ensuring quality and affordable housing while sustaining neighborhood strength and diversity.</p>
+<p>The project aims to analyze affordable housing units in NYC. The dataset originates from The Department of Housing Preservation and Development (HPD), a department of the government of NYC dedicated to ensuring quality and affordable housing while sustaining neighborhood strength and diversity.</p>
 <p>The dataset can be easily accessed by downloading the CSV file from https://data.cityofnewyork.us/Housing-Development/Affordable-Housing-Production-by-Building/hg8x-zxpr/about_data, which can be directed via the NYC Housing Preservation &amp; Development government website (https://www.nyc.gov/site/hpd/about/open-data.page).</p>
 <p>The dataset was compiled by HPD using various methods, including wage information for housing development projects as mandated by Local Law 44, registration details from owners of residential rental properties, and survey data from housing units across the city. It consists of 41 columns and 7,637 rows, with each row representing details of a housing development or preservation project. According to the HPD, the dataset was first published to the public on December 20, 2016. It undergoes quarterly updates and the most recent update occurred on September 23, 2024.</p>
 <p>One notable issue with the dataset is that some entries in the Project Completion Date column remain empty, indicating that the project is still ongoing. Therefore, it is necessary to manually input NA values to these empty entries.</p>
@@ -275,7 +275,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="missing-value-analysis" class="level2" data-number="2.2">
 <h2 data-number="2.2" class="anchored" data-anchor-id="missing-value-analysis"><span class="header-section-number">2.2</span> Missing value analysis</h2>
-<p>Data 1: Affordable Housing Production by Building</p>
 <p>To examine patterns in missing values, we begin by determining the count of NAs in each column.</p>
 <div class="cell">
 <details class="code-fold">
@@ -368,7 +367,7 @@ attr(,"package")
 </div>
 </div>
 </div>
-<p>Another visualization reveals the same pattern of the NA values. Approximately 6,000 rows have complete data across the columns, while around 1,500 rows have missing values in the Project Completion Date column.</p>
+<p>Another visualization reveals the same pattern of the NA values. Approximately 6,000 rows have complete data across the columns, while around 1,600 rows have missing values in the Project Completion Date column.</p>
 <div class="cell">
 <details class="code-fold">
 <summary>Code</summary>
@@ -398,7 +397,7 @@ attr(,"package")
 </div>
 </div>
 </div>
-<p>To determine whether missing values in the Project.Completion.Date column are correlated with values of another variable, we analyzed the percentage of NA values by borough (Bronx, Brooklyn, Manhattan, Queens, and Staten Island). The results reveal that Queens marked the highest rate of NA values for both columns (approximately 32%) while Staten Island had the lowest proportion (approximately 2-3%). The rest of the boroughs marked approximately equal rate of NA values at around 20%. This analysis may highlight a clear geographic trend in the missing data, with Queens emerging as the most problematic borough with ongoing projects and Staten Island being the least affected with most of projects completed. It might also suggest that the number of projects varies significantly between boroughs.</p>
+<p>To determine whether missing values in the Project.Completion.Date column are correlated with values of another variable, we analyzed the percentage of NA values by borough (Bronx, Brooklyn, Manhattan, Queens, and Staten Island). The results reveal that Queens marked the highest rate of NA values (approximately 32%) while Staten Island had the lowest proportion (approximately 2-3%). The rest of the boroughs marked approximately equal rate of NA values at around 20%. This analysis may highlight a clear geographic trend in the missing data, with Queens emerging as the most problematic borough with ongoing projects and Staten Island being the least affected with most of projects completed. It might also suggest that the number of projects varies significantly between boroughs.</p>
 
 
 </section>

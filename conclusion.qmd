@@ -1,5 +1,5 @@
 # Conclusion
-# Main Takeaways
+## Main Takeaways
 - 1BR and 2BR units are the most common housing types across all boroughs, reflecting their suitability for smaller households, such as individuals or small family households, that make up a large proportion of NYC’s population.
 
 - There is a significant portion on Very Low-Income and Low-Income Units across boroughs, highlighting the city's efforts to address housing affordability for economically disadvantaged populations.
@@ -11,16 +11,18 @@
 - Homeownership and rental units follow a similar pattern of rise and decline despite differences in their relative percentages, suggesting a strong positive correlation among the two types of housing units.
 
 
-# Limiatations
+
+## Limiatations
 The data focuses on housing tied to an affordable housing project, which may not represent the whole NYC's housing market or include privately developed or market-rate housings.
 In addition, the graphs do not account for variations in household size, income level, or demographics, which are factors that can influence housing demand for specific unit types. Borough comparisons may oversimplify the unique socioeconomic and geographic factors influencing housing distributions within each borough.
 
 
-# Future Directions
+
+## Future Directions
 In the future, we can include market-rate housing data to get a more comprehensive understanding of New York City's housing landscape. Additionally, adding information on income levels, household size, and demographics would enable a more detailed exploration. For a deeper analysis, we could go beyond borough-level trends to neighborhoods or community districts for a more localized perspective. Furthermore, examining the impact of gentrification and displacement on housing availability and affordability across boroughs would offer valuable insights.
 
 
-# Lessons Learned 
+## Lessons Learned 
 During the project, we realized the importance of regularly backing up files and keeping our workflow updated on GitHub. At one point, we accidentally saved an incorrect version of the file, which could have required us to spend time reproducing the lost code. Fortunately, GitHub allowed us to successfully restart from the previous checkpoint, saving both time and effort.
 
-In addition, when working with the map of NYC (shapefile) and our data, I had difficulties linking the community districts because the labeling conventions were different. The map used numeric labels (e.g., 101-112), while our dataset used alphanumeric labels (e.g., MN-01). This mismatch made it challenging to align the two datasets and required additional steps to create a mapping between them. Through this experience, I learned the importance of using clear, consistent, and well-documented labeling systems when preparing datasets. By specifying the labeling conventions and including guides, we can make our data more accessible and user-friendly for others who may work with it in the future.
+In addition, when working with the map of NYC (shapefile) and our data, we had difficulties linking the community districts because the labeling conventions were different. The map used numeric labels (e.g., 101-112), while our dataset used alphanumeric labels (e.g., MN-01). This mismatch made it challenging to align the two datasets and required additional steps to create a mapping between them. Through this experience, we learned the importance of using clear, consistent, and well-documented labeling systems when preparing datasets. By specifying the labeling conventions and including guides, we can make our data more accessible and user-friendly for others who may work with it in the future.

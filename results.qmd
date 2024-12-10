@@ -15,7 +15,7 @@ library(GGally)
 
 
 ```{r}
-data <- read.csv("/Users/chaerinnoh/Desktop/Housing.csv")
+data <- read.csv("/Users/chrisyang/Downloads/Housing.csv")
 
 data <- data |> 
   select("Project.ID", "Project.Start.Date", "Project.Completion.Date", "Borough", "Community.Board",
@@ -33,199 +33,7 @@ data <- data |>
   mutate(ProjectDuration = as.numeric(Project.Completion.Date - Project.Start.Date))
 ```
 
-
-```{r}
-income_proportions <- data |>
-  select(Borough, Extremely.Low.Income.Units, 
-         Very.Low.Income.Units, Low.Income.Units, Moderate.Income.Units,
-         Middle.Income.Units, Other.Income.Units) |>
-  group_by(Borough) |>
-  summarise(across(
-    Extremely.Low.Income.Units:Other.Income.Units,
-    ~ sum(.x, na.rm = TRUE)
-  )) |>
-  mutate(TotalUnits = rowSums(across(Extremely.Low.Income.Units:Other.Income.Units))) |>
-  mutate(across(
-    Extremely.Low.Income.Units:Other.Income.Units,
-    ~ .x / TotalUnits,
-    .names = "Proportion_{.col}"
-  )) |>
-  pivot_longer(
-    cols = starts_with("Proportion"),
-    names_to = "IncomeType",
-    values_to = "Proportion"
-  ) |>
-  mutate(
-      IncomeType = gsub("Proportion_", "", IncomeType),
-      IncomeType = fct_relevel(IncomeType, "Extremely.Low.Income.Units", "Very.Low.Income.Units",
-                               "Low.Income.Units",
-                               "Moderate.Income.Units", "Middle.Income.Units", "Other.Income.Units")
-    )
-
-income_colors <- c(
-  "Extremely.Low.Income.Units" = "#fde0dd",  
-  "Very.Low.Income.Units" = "#fcc5c0",     
-  "Low.Income.Units" = "#fa9fb5",       
-  "Moderate.Income.Units" = "#f768a1",    
-  "Middle.Income.Units" = "#dd3497",     
-  "Other.Income.Units" = "#49006a"          
-)
-
-ggplot(income_proportions, aes(x = IncomeType, y = Proportion, fill = IncomeType)) +
-  geom_bar(stat = "identity", position = "dodge") +
-  facet_wrap(~ Borough) +
-  scale_fill_manual(
-    values = income_colors,  
-    name = "Income Type"
-  ) +
-  scale_y_continuous(labels = scales::percent_format()) +
-  labs(
-    title = "Income Proportions by Borough",
-    x = "Income Type",
-    y = "Proportion",
-    fill = "Income Type"
-  ) +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
-```
-
-Here we look at the income proportions for each borough. Given that the dataset came from an affordable housing project, we can see that the proportions are high for very low income units and low income units for all boroughs. Bronx and Brooklyn show similar patterns, with a gradual increase of proportion from extremely low to low income types and a significant drop on moderate and the low proportion persists to the middle income units. Queens is also similar with the difference being that there are more propotions of moderate and middle income units. One standout observation is the overwhelming proportion of low income units in Staten Island, making up about 52%, with significantly smaller proportions in other income categories. In contrast, Manhattan has a more balanced distribution of income types, showing greater variability. This suggests that its housing developments aim to cater to a broader range of economic groups.
-
-```{r}
-ggparcoord(data, columns=13:19, groupColumn="Borough", alpha=0.3, scale='uniminmax',splineFactor=10, 
-           title = "Modified parallel coordinate plot for Housing Data")
-```
-
-While most of the lines are concentrated around lower values on the y-axis (near 0) we can see that 1BR and 2BR units are the most common housing types for all boroughs. This reflects their suitability for single-person households or small families, which make up a large proportion of NYC's population. Across all boroughs, larger units are relatively rare, highlighting a gap in housing availability for larger families. Bronx, Brooklyn, and Staten Island show more variation and higher spikes in 3BR and larger units. Manhattan has a lot of outliers in where there are a small number of bedroom units.
-
-```{r}
-manhattan_totals <- data |>
-  filter(Borough == "Manhattan") |>
-  group_by(Community.Board) |>
-  summarise(
-    TotalStudio = sum(Studio.Units, na.rm = TRUE),
-    Total1BR = sum(X1.BR.Units, na.rm = TRUE),
-    Total2BR = sum(X2.BR.Units, na.rm = TRUE),
-    Total3BR = sum(X3.BR.Units, na.rm = TRUE),
-    Total4BR = sum(X4.BR.Units, na.rm = TRUE),
-    Total5PlusBR = sum(X5.BR.Units, na.rm = TRUE)
-  )
-
-manhattan_long <- manhattan_totals |>
-  pivot_longer(
-    cols = starts_with("Total"),
-    names_to = "BedroomType",
-    values_to = "Count"
-  ) |>
-  mutate(
-    BedroomType = fct_relevel(BedroomType, 
-                              "TotalStudio", 
-                              "Total1BR", 
-                              "Total2BR", 
-                              "Total3BR", 
-                              "Total4BR", 
-                              "Total5PlusBR")
-  )
-
-ggplot(manhattan_long, aes(x = Community.Board, y = BedroomType, fill = Count)) +
-  geom_tile() +
-  scale_fill_gradient(low = "white", high = "blue") +
-  labs(
-    title = "Heatmap of Bedroom Units by Manhattan Community Boards",
-    x = "Community Board",
-    y = "Bedroom Type",
-    fill = "Total Units"
-  ) +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
-```
-
-https://www.nyc.gov/site/planning/plans/voids-central/voids-central.page
-
-This graph shows the residential housing landscape in Manhattan. There are more number of smaller housing units (1BR and 2BR), reflecting the demand for housing suitable for individuals or small households. The concentration of units in District 11(MN-11) suggests that areas like East Harlem have been a focus for development, particularly for low- to moderate-income residents.
-
-On the other hand, areas like District 1 and 2 (MN-01, MN-02) have fewer housing units overall, possibly due to the dominance of commercial spaces or high-income luxury housing that may not cater to smaller or affordable units. (reference to link which shows the central business districts). Fewer number of larger units (3BR and above) across the borough may indicate the challenges of accommodating larger families in Manhattan’s housing market.
-
-```{r, include = FALSE, message = FALSE, warning = FALSE}
-constructionData <- data |>
-  filter(Reporting.Construction.Type == "New Construction") 
-
-constructionData <- constructionData |>
-  filter(ProjectDuration != 0)
-
-constructionData$"Start.Year" <- as.numeric(constructionData$"Start.Year")
-
-constructionGraphData <- constructionData |>
-  group_by(Borough, Start.Year) |>
-  summarise(
-    proportionSum = 
-      sum(Studio.Units, na.rm = TRUE) + 
-      sum(X1.BR.Units, na.rm = TRUE) + 
-      sum(X2.BR.Units, na.rm = TRUE) + 
-      sum(X3.BR.Units, na.rm = TRUE) + 
-      sum(X4.BR.Units, na.rm = TRUE) + 
-      sum(X5.BR.Units, na.rm = TRUE) + 
-      sum(X6.BR..Units, na.rm = TRUE)  
-  ) |>
-  ungroup()
-```
-
-```{r}
-ggplot(constructionGraphData, aes(x = Start.Year, y = proportionSum, color = Borough)) +
-  geom_line(size = 1) +
-  geom_point(size = 2) +
-  labs(
-    title = "Time Series of Newly Constructed Units by Borough",
-    x = "Newly Constructed Units",
-    y = "Start Year",
-    color = "Borough"
-  ) +
-  scale_x_continuous(breaks = seq(2014, 2024, 1), limits = c(2014, 2024)) +
-  theme_minimal() +
-  theme(legend.title = element_blank())
-```
-
-
-This figure presents the annual number of newly constructed housing units across the five boroughs of New York, providing insights into the temporal and spatial distribution of housing development. It highlights boroughs with the highest number of new units and the decline in construction activity in the most recent years (post 2020). Overall, Brooklyn and Bronx consistently mark the highest levels of construction activity annually while Staten Island records the lowest.
-
-```{r, include = FALSE, message = FALSE, warning = FALSE}
-newConstructionData <- constructionData |>
-  pivot_longer(
-    cols = c("Studio.Units", "X1.BR.Units", "X2.BR.Units", "X3.BR.Units", 
-             "X4.BR.Units", "X5.BR.Units", "X6.BR..Units"),  
-    names_to = "UnitType",
-    values_to = "Proportion"
-  )
-      
-newConstructionGraph <- newConstructionData |>
-  group_by(Borough, Start.Year, UnitType) |>
-  summarise(Proportion = sum(Proportion, na.rm = TRUE)) |>
-  ungroup()
-```
-
-```{r, fig.width= 8, fig.height = 10}
-newConstructionGraph$Start.Year <- as.numeric(newConstructionGraph$Start.Year)
-
-ggplot(newConstructionGraph, aes(x = Start.Year, y = Proportion, color = Borough)) +
-  geom_line(size = 1) +
-  geom_point(size = 2) +
-  facet_wrap(~ UnitType, scales = "free_y") +  
-  labs(
-    title = "Time Series of Proportion of Newly Constructed Units by Borough and Unit Type",
-    x = "Start Year",
-    y = "Newly Constructed Units",
-    color = "Borough"
-  ) +
-  scale_x_continuous(breaks = seq(2014, 2024, 1), limits = c(2014, 2024)) +
-  theme_minimal() +
-  theme(legend.title = element_blank()) +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
-```
-
-
-
-
-
-Focusing on the number of newly constructed units per unit type (studio, one bedroom, ..., six or more bedrooms), the figure above breaks the previous graph into facets. The trend of Bronx and Brooklyn marking the highest construction activity and Staten Island having the lowest persist across all the unit types, implying that the proportion of newly constructed units are same across the five boroughs. Notably, no units with five or more bedrooms were newly constructed within the time period covered by the data.
+## Housing Unit Type
 
 
 ```{r, warning = FALSE}
@@ -349,10 +157,220 @@ This graph depicts the CDF of rental and homeownership units from 2018 to 2022, 
 Over these five years, both homeownership and rental units usually experienced a rapid increase in cumulative units in June, except for 2020, which saw the highest increase in March. After the steep slope, the growth of homeownership units flattens for majority of the months while the rental units exhibits smaller monthly increments later in the year. The quarterly data update explains the significant increases in March, June, September, and December.
 
 ```{r, include = FALSE, message = FALSE, warning = FALSE}
-nyc_shapefile <- st_read("~/Desktop/Districts/geo_export_c0d8af41-79ac-4f04-92b7-535a92a2885e.shx")
+constructionData <- data |>
+  filter(Reporting.Construction.Type == "New Construction") 
+
+constructionData <- constructionData |>
+  filter(ProjectDuration != 0)
+
+constructionData$"Start.Year" <- as.numeric(constructionData$"Start.Year")
+
+constructionGraphData <- constructionData |>
+  group_by(Borough, Start.Year) |>
+  summarise(
+    proportionSum = 
+      sum(Studio.Units, na.rm = TRUE) + 
+      sum(X1.BR.Units, na.rm = TRUE) + 
+      sum(X2.BR.Units, na.rm = TRUE) + 
+      sum(X3.BR.Units, na.rm = TRUE) + 
+      sum(X4.BR.Units, na.rm = TRUE) + 
+      sum(X5.BR.Units, na.rm = TRUE) + 
+      sum(X6.BR..Units, na.rm = TRUE)  
+  ) |>
+  ungroup()
+```
+
+```{r, warning = FALSE}
+constructionData <- constructionData |>
+  filter(ProjectDuration != 0)
+
+ggplot(constructionData, aes(x = ProjectDuration, y = Total.Units)) +
+  geom_point(size = 1, alpha = 0.2) +
+  facet_wrap(~ Borough) +
+  labs(
+    title = "Scatterplot of Project Duration vs Total Housing Units by Borough",
+    x = "Project Duration (Days)",
+    y = "Total Units"
+  ) +
+  theme_minimal()
+```
+This scatterplot examines the relationship between project duration (in days) and the total number of housing units for each construction project across the five boroughs. By visualizing these patterns, we aim to compare housing construction patterns and identify borough specific trends. As concluded from the previous figure, Staten Island recorded the fewest number of newly constructed units, preventing us from drawing meaningful conclusions for that borough. Across all boroughs, most construction projects ended within 1,000 days while a few extending between 1,000 days to 2,000 days.
+
+## Housing Unit Structure Type
+
+```{r}
+ggparcoord(data, columns=13:19, groupColumn="Borough", alpha=0.3, scale='uniminmax',splineFactor=10, 
+           title = "Modified parallel coordinate plot for Housing Data")
+```
+
+While most of the lines are concentrated around lower values on the y-axis (near 0) we can see that 1BR and 2BR units are the most common housing types for all boroughs. This reflects their suitability for single-person households or small families, which make up a large proportion of NYC's population. Across all boroughs, larger units are relatively rare, highlighting a gap in housing availability for larger families. Bronx, Brooklyn, and Staten Island show more variation and higher spikes in 3BR and larger units. Manhattan has a lot of outliers in where there are a small number of bedroom units.
+
+```{r}
+manhattan_totals <- data |>
+  filter(Borough == "Manhattan") |>
+  group_by(Community.Board) |>
+  summarise(
+    TotalStudio = sum(Studio.Units, na.rm = TRUE),
+    Total1BR = sum(X1.BR.Units, na.rm = TRUE),
+    Total2BR = sum(X2.BR.Units, na.rm = TRUE),
+    Total3BR = sum(X3.BR.Units, na.rm = TRUE),
+    Total4BR = sum(X4.BR.Units, na.rm = TRUE),
+    Total5PlusBR = sum(X5.BR.Units, na.rm = TRUE)
+  )
+
+manhattan_long <- manhattan_totals |>
+  pivot_longer(
+    cols = starts_with("Total"),
+    names_to = "BedroomType",
+    values_to = "Count"
+  ) |>
+  mutate(
+    BedroomType = fct_relevel(BedroomType, 
+                              "TotalStudio", 
+                              "Total1BR", 
+                              "Total2BR", 
+                              "Total3BR", 
+                              "Total4BR", 
+                              "Total5PlusBR")
+  )
+
+ggplot(manhattan_long, aes(x = Community.Board, y = BedroomType, fill = Count)) +
+  geom_tile() +
+  scale_fill_gradient(low = "white", high = "blue") +
+  labs(
+    title = "Heatmap of Bedroom Units by Manhattan Community Boards",
+    x = "Community Board",
+    y = "Bedroom Type",
+    fill = "Total Units"
+  ) +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+https://www.nyc.gov/site/planning/plans/voids-central/voids-central.page
+
+This graph shows the residential housing landscape in Manhattan. There are more number of smaller housing units (1BR and 2BR), reflecting the demand for housing suitable for individuals or small households. The concentration of units in District 11(MN-11) suggests that areas like East Harlem have been a focus for development, particularly for low- to moderate-income residents.
+
+On the other hand, areas like District 1 and 2 (MN-01, MN-02) have fewer housing units overall, possibly due to the dominance of commercial spaces or high-income luxury housing that may not cater to smaller or affordable units. (reference to link which shows the central business districts). Fewer number of larger units (3BR and above) across the borough may indicate the challenges of accommodating larger families in Manhattan’s housing market.
+
+
+```{r}
+ggplot(constructionGraphData, aes(x = Start.Year, y = proportionSum, color = Borough)) +
+  geom_line(size = 1) +
+  geom_point(size = 2) +
+  labs(
+    title = "Time Series of Newly Constructed Units by Borough",
+    x = "Newly Constructed Units",
+    y = "Start Year",
+    color = "Borough"
+  ) +
+  scale_x_continuous(breaks = seq(2014, 2024, 1), limits = c(2014, 2024)) +
+  theme_minimal() +
+  theme(legend.title = element_blank())
 ```
 
 
+This figure presents the annual number of newly constructed housing units across the five boroughs of New York, providing insights into the temporal and spatial distribution of housing development. It highlights boroughs with the highest number of new units and the decline in construction activity in the most recent years (post 2020). Overall, Brooklyn and Bronx consistently mark the highest levels of construction activity annually while Staten Island records the lowest.
+
+```{r, include = FALSE, message = FALSE, warning = FALSE}
+newConstructionData <- constructionData |>
+  pivot_longer(
+    cols = c("Studio.Units", "X1.BR.Units", "X2.BR.Units", "X3.BR.Units", 
+             "X4.BR.Units", "X5.BR.Units", "X6.BR..Units"),  
+    names_to = "UnitType",
+    values_to = "Proportion"
+  )
+      
+newConstructionGraph <- newConstructionData |>
+  group_by(Borough, Start.Year, UnitType) |>
+  summarise(Proportion = sum(Proportion, na.rm = TRUE)) |>
+  ungroup()
+```
+
+```{r, fig.width= 8, fig.height = 10}
+newConstructionGraph$Start.Year <- as.numeric(newConstructionGraph$Start.Year)
+
+ggplot(newConstructionGraph, aes(x = Start.Year, y = Proportion, color = Borough)) +
+  geom_line(size = 1) +
+  geom_point(size = 2) +
+  facet_wrap(~ UnitType, scales = "free_y") +  
+  labs(
+    title = "Time Series of Proportion of Newly Constructed Units by Borough and Unit Type",
+    x = "Start Year",
+    y = "Newly Constructed Units",
+    color = "Borough"
+  ) +
+  scale_x_continuous(breaks = seq(2014, 2024, 1), limits = c(2014, 2024)) +
+  theme_minimal() +
+  theme(legend.title = element_blank()) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+Focusing on the number of newly constructed units per unit type (studio, one bedroom, ..., six or more bedrooms), the figure above breaks the previous graph into facets. The trend of Bronx and Brooklyn marking the highest construction activity and Staten Island having the lowest persist across all the unit types, implying that the proportion of newly constructed units are same across the five boroughs. Notably, no units with five or more bedrooms were newly constructed within the time period covered by the data.
+
+
+## Income Type
+
+```{r}
+income_proportions <- data |>
+  select(Borough, Extremely.Low.Income.Units, 
+         Very.Low.Income.Units, Low.Income.Units, Moderate.Income.Units,
+         Middle.Income.Units, Other.Income.Units) |>
+  group_by(Borough) |>
+  summarise(across(
+    Extremely.Low.Income.Units:Other.Income.Units,
+    ~ sum(.x, na.rm = TRUE)
+  )) |>
+  mutate(TotalUnits = rowSums(across(Extremely.Low.Income.Units:Other.Income.Units))) |>
+  mutate(across(
+    Extremely.Low.Income.Units:Other.Income.Units,
+    ~ .x / TotalUnits,
+    .names = "Proportion_{.col}"
+  )) |>
+  pivot_longer(
+    cols = starts_with("Proportion"),
+    names_to = "IncomeType",
+    values_to = "Proportion"
+  ) |>
+  mutate(
+      IncomeType = gsub("Proportion_", "", IncomeType),
+      IncomeType = fct_relevel(IncomeType, "Extremely.Low.Income.Units", "Very.Low.Income.Units",
+                               "Low.Income.Units",
+                               "Moderate.Income.Units", "Middle.Income.Units", "Other.Income.Units")
+    )
+
+income_colors <- c(
+  "Extremely.Low.Income.Units" = "#fde0dd",  
+  "Very.Low.Income.Units" = "#fcc5c0",     
+  "Low.Income.Units" = "#fa9fb5",       
+  "Moderate.Income.Units" = "#f768a1",    
+  "Middle.Income.Units" = "#dd3497",     
+  "Other.Income.Units" = "#49006a"          
+)
+
+ggplot(income_proportions, aes(x = IncomeType, y = Proportion, fill = IncomeType)) +
+  geom_bar(stat = "identity", position = "dodge") +
+  facet_wrap(~ Borough) +
+  scale_fill_manual(
+    values = income_colors,  
+    name = "Income Type"
+  ) +
+  scale_y_continuous(labels = scales::percent_format()) +
+  labs(
+    title = "Income Proportions by Borough",
+    x = "Income Type",
+    y = "Proportion",
+    fill = "Income Type"
+  ) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+Here we look at the income proportions for each borough. Given that the dataset came from an affordable housing project, we can see that the proportions are high for very low income units and low income units for all boroughs. Bronx and Brooklyn show similar patterns, with a gradual increase of proportion from extremely low to low income types and a significant drop on moderate and the low proportion persists to the middle income units. Queens is also similar with the difference being that there are more propotions of moderate and middle income units. One standout observation is the overwhelming proportion of low income units in Staten Island, making up about 52%, with significantly smaller proportions in other income categories. In contrast, Manhattan has a more balanced distribution of income types, showing greater variability. This suggests that its housing developments aim to cater to a broader range of economic groups.
+
+
+```{r, include = FALSE, message = FALSE, warning = FALSE}
+nyc_shapefile <- st_read("/Users/chrisyang/Desktop/Districts/geo_export_c0d8af41-79ac-4f04-92b7-535a92a2885e.shx")
+```
 
 
 ```{r}
@@ -466,18 +484,9 @@ ggplot(merged_data) +
 Each district is colored based on its dominant income unit category, showing housing trends across NYC. Many districts are dominated by "Extremely.Low.Income.Units" and "Very.Low.Income.Units". The clear differences between neighborhoods reveal housing inequalities, with lower-income units concentrated in certain areas. These difference points to broader economic disparities that affect access to housing for different income groups.
 
 
-```{r, warning = FALSE}
-constructionData <- constructionData |>
-  filter(ProjectDuration != 0)
 
-ggplot(constructionData, aes(x = ProjectDuration, y = Total.Units)) +
-  geom_point(size = 1, alpha = 0.2) +
-  facet_wrap(~ Borough) +
-  labs(
-    title = "Scatterplot of Project Duration vs Total Housing Units by Borough",
-    x = "Project Duration (Days)",
-    y = "Total Units"
-  ) +
-  theme_minimal()
-```
-This scatterplot examines the relationship between project duration (in days) and the total number of housing units for each construction project across the five boroughs. By visualizing these patterns, we aim to compare housing construction patterns and identify borough specific trends. As concluded from the previous figure, Staten Island recorded the fewest number of newly constructed units, preventing us from drawing meaningful conclusions for that borough. Across all boroughs, most construction projects ended within 1,000 days while a few extending between 1,000 days to 2,000 days.
+
+
+
+
+

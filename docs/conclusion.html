@@ -148,10 +148,12 @@ ul.task-list li input[type="checkbox"] {
     <h2 id="toc-title">Table of contents</h2>
    
   <ul>
-  <li><a href="#main-takeaways" id="toc-main-takeaways" class="nav-link active" data-scroll-target="#main-takeaways"><span class="header-section-number">6</span> Main Takeaways</a></li>
-  <li><a href="#limiatations" id="toc-limiatations" class="nav-link" data-scroll-target="#limiatations"><span class="header-section-number">7</span> Limiatations</a></li>
-  <li><a href="#future-directions" id="toc-future-directions" class="nav-link" data-scroll-target="#future-directions"><span class="header-section-number">8</span> Future Directions</a></li>
-  <li><a href="#lessons-learned" id="toc-lessons-learned" class="nav-link" data-scroll-target="#lessons-learned"><span class="header-section-number">9</span> Lessons Learned</a></li>
+
+  <li><a href="#main-takeaways" id="toc-main-takeaways" class="nav-link active" data-scroll-target="#main-takeaways"><span class="header-section-number">5.1</span> Main Takeaways</a></li>
+  <li><a href="#limiatations" id="toc-limiatations" class="nav-link" data-scroll-target="#limiatations"><span class="header-section-number">5.2</span> Limiatations</a></li>
+  <li><a href="#future-directions" id="toc-future-directions" class="nav-link" data-scroll-target="#future-directions"><span class="header-section-number">5.3</span> Future Directions</a></li>
+  <li><a href="#lessons-learned" id="toc-lessons-learned" class="nav-link" data-scroll-target="#lessons-learned"><span class="header-section-number">5.4</span> Lessons Learned</a></li>
+
   </ul>
 <div class="toc-actions"><ul><li><a href="https://github.com/chrisyang922/HousingProduction/edit/main/conclusion.qmd" class="toc-action"><i class="bi bi-github"></i>Edit this page</a></li><li><a href="https://github.com/chrisyang922/HousingProduction/issues/new" class="toc-action"><i class="bi empty"></i>Report an issue</a></li></ul></div></nav>
     </div>
@@ -177,8 +179,9 @@ ul.task-list li input[type="checkbox"] {
 </header>
 
 
-<section id="main-takeaways" class="level1" data-number="6">
-<h1 data-number="6"><span class="header-section-number">6</span> Main Takeaways</h1>
+<section id="main-takeaways" class="level2" data-number="5.1">
+<h2 data-number="5.1" class="anchored" data-anchor-id="main-takeaways"><span class="header-section-number">5.1</span> Main Takeaways</h2>
+
 <ul>
 <li><p>1BR and 2BR units are the most common housing types across all boroughs, reflecting their suitability for smaller households, such as individuals or small family households, that make up a large proportion of NYC’s population.</p></li>
 <li><p>There is a significant portion on Very Low-Income and Low-Income Units across boroughs, highlighting the city’s efforts to address housing affordability for economically disadvantaged populations.</p></li>
@@ -187,18 +190,20 @@ ul.task-list li input[type="checkbox"] {
 <li><p>Homeownership and rental units follow a similar pattern of rise and decline despite differences in their relative percentages, suggesting a strong positive correlation among the two types of housing units.</p></li>
 </ul>
 </section>
-<section id="limiatations" class="level1" data-number="7">
-<h1 data-number="7"><span class="header-section-number">7</span> Limiatations</h1>
+
+<section id="limiatations" class="level2" data-number="5.2">
+<h2 data-number="5.2" class="anchored" data-anchor-id="limiatations"><span class="header-section-number">5.2</span> Limiatations</h2>
 <p>The data focuses on housing tied to an affordable housing project, which may not represent the whole NYC’s housing market or include privately developed or market-rate housings. In addition, the graphs do not account for variations in household size, income level, or demographics, which are factors that can influence housing demand for specific unit types. Borough comparisons may oversimplify the unique socioeconomic and geographic factors influencing housing distributions within each borough.</p>
 </section>
-<section id="future-directions" class="level1" data-number="8">
-<h1 data-number="8"><span class="header-section-number">8</span> Future Directions</h1>
+<section id="future-directions" class="level2" data-number="5.3">
+<h2 data-number="5.3" class="anchored" data-anchor-id="future-directions"><span class="header-section-number">5.3</span> Future Directions</h2>
 <p>In the future, we can include market-rate housing data to get a more comprehensive understanding of New York City’s housing landscape. Additionally, adding information on income levels, household size, and demographics would enable a more detailed exploration. For a deeper analysis, we could go beyond borough-level trends to neighborhoods or community districts for a more localized perspective. Furthermore, examining the impact of gentrification and displacement on housing availability and affordability across boroughs would offer valuable insights.</p>
 </section>
-<section id="lessons-learned" class="level1" data-number="9">
-<h1 data-number="9"><span class="header-section-number">9</span> Lessons Learned</h1>
+<section id="lessons-learned" class="level2" data-number="5.4">
+<h2 data-number="5.4" class="anchored" data-anchor-id="lessons-learned"><span class="header-section-number">5.4</span> Lessons Learned</h2>
 <p>During the project, we realized the importance of regularly backing up files and keeping our workflow updated on GitHub. At one point, we accidentally saved an incorrect version of the file, which could have required us to spend time reproducing the lost code. Fortunately, GitHub allowed us to successfully restart from the previous checkpoint, saving both time and effort.</p>
-<p>In addition, when working with the map of NYC (shapefile) and our data, I had difficulties linking the community districts because the labeling conventions were different. The map used numeric labels (e.g., 101-112), while our dataset used alphanumeric labels (e.g., MN-01). This mismatch made it challenging to align the two datasets and required additional steps to create a mapping between them. Through this experience, I learned the importance of using clear, consistent, and well-documented labeling systems when preparing datasets. By specifying the labeling conventions and including guides, we can make our data more accessible and user-friendly for others who may work with it in the future.</p>
+<p>In addition, when working with the map of NYC (shapefile) and our data, we had difficulties linking the community districts because the labeling conventions were different. The map used numeric labels (e.g., 101-112), while our dataset used alphanumeric labels (e.g., MN-01). This mismatch made it challenging to align the two datasets and required additional steps to create a mapping between them. Through this experience, we learned the importance of using clear, consistent, and well-documented labeling systems when preparing datasets. By specifying the labeling conventions and including guides, we can make our data more accessible and user-friendly for others who may work with it in the future.</p>
+
 
 
 </section>
