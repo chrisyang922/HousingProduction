@@ -78,15 +78,14 @@ const datasets = {
 
 const w = 800;
 const h = 600;
-const padding = 30;
 
-let xmin = 2014;
-let xmax = 2024;
-let ymin = 0;
-let ymax = 0;
+let yearMin = 2014;
+let yearMax = 2024;
+let unitMin = 0;
+let unitMax = 0;
 
-let xScale = d3.scaleLinear().range([padding + 50, w - padding * 2 + 50]);
-let yScale = d3.scaleLinear().range([h - padding, padding]);
+let xScale = d3.scaleLinear().range([100, 750]);
+let yScale = d3.scaleLinear().range([550, 100]);
 
 const svg = d3.select("div#plot")
   .append("svg")
@@ -108,10 +107,10 @@ function renderGraph(data) {
   const remainingData = [...data.slice(6)]; 
   let userPoints = [...initialData];
 
-  ymin = 0;
-  ymax = d3.max(data, d => d.Units);
-  xScale.domain([xmin, xmax]);
-  yScale.domain([ymin, ymax]);
+  unitMin = 0;
+  unitMax = d3.max(data, d => d.Units);
+  xScale.domain([yearMin, yearMax]);
+  yScale.domain([unitMin, unitMax]);
 
   const xAxis = d3.axisBottom(xScale)
     .tickValues(d3.range(2014, 2025)) 
@@ -120,11 +119,11 @@ function renderGraph(data) {
   const yAxis = d3.axisLeft(yScale).ticks(10);
 
   xAxisGroup
-    .attr("transform", `translate(0, ${h - padding})`)
+    .attr("transform", `translate(0, ${550})`)
     .call(xAxis);
 
   yAxisGroup
-    .attr("transform", `translate(${padding + 50}, 0)`)
+    .attr("transform", `translate(${100}, 0)`)
     .call(yAxis);
 
   svg.append("path")
